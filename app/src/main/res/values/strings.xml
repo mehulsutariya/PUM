@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Zakupy</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Lista zakupów -->
+    <string name="shopping_list_product">Produkt</string>
+    <string name="shopping_list_price">Cena</string>
+    <string name="done_button_text">Gotowe</string>
+    <string name="edit_button">Edytuj</string>
+    <string name="sum">Suma:</string>
+    <string name="empty_list">Lista zakupów jest pusta</string>
+    <string name="product_added">Dodano nowy produkt</string>
+    <string name="category">Kategoria</string>
+
+    <!-- Dodawanie produktów do listy -->
+    <string name="title_activity_add_new_item">Dodaj nowe produkty</string>
+    <string name="add_item_button">Dodaj kolejny produkt</string>
+
+    <!-- Okno dialogowe przy usuwaniu pozycji z listy: -->
+    <string name="delete_dialog_message">Usunąć pozycję?</string>
+    <string name="delete_button">Usuń</string>
+    <string name="cancel_button">Anuluj</string>
+
+</resources>

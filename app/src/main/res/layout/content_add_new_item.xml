@@ -1,0 +1,39 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+            <AutoCompleteTextView
+                android:id="@+id/product_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/shopping_list_product"
+                android:inputType="textAutoComplete"
+                android:imeOptions="actionDone" />
+        </android.support.design.widget.TextInputLayout>
+
+        <Spinner
+            android:id="@+id/product_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></Spinner>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+            <EditText
+                android:id="@+id/price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/shopping_list_price"
+                android:inputType="numberDecimal"
+                android:imeOptions="actionDone" />
+        </android.support.design.widget.TextInputLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>
