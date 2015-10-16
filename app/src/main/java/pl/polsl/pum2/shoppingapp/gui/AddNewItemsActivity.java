@@ -41,20 +41,20 @@ public class AddNewItemsActivity extends AppCompatActivity {
         newItemsRecyclerView.setLayoutManager(newItemsListLayoutManager);
         newItemsListAdapter = new NewItemsListAdapter(shoppingListItemDataArray);
         newItemsRecyclerView.setAdapter(newItemsListAdapter);
-        insertNewItem(0);
+        insertNewItem();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private void insertNewItem(int position) {
+    private void insertNewItem() {
         shoppingListItemDataArray.add(new ShoppingListItemData());
-        newItemsListAdapter.notifyItemInserted(position);
+        newItemsListAdapter.notifyItemInserted(shoppingListItemDataArray.size() - 1);
     }
 
     public void addItemButtonClick (View v) {
         //TODO
         //Tymczasowo:
-        insertNewItem(shoppingListItemDataArray.size() - 1);
+        insertNewItem();
     }
 
 }
