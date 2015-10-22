@@ -15,6 +15,7 @@
     <!-- Dodawanie produktów do listy -->
     <string name="title_activity_add_new_item">Dodaj nowe produkty</string>
     <string name="add_item_button">Dodaj kolejny produkt</string>
+    <string name="quantity">Ilość</string>
 
     <!-- Okno dialogowe przy usuwaniu pozycji z listy: -->
     <string name="delete_dialog_message">Usunąć pozycję?</string>

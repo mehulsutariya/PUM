@@ -10,135 +10,219 @@
         android:layout_gravity="top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        
-        <android.support.v7.widget.GridLayout
+
+        <ViewFlipper
+            android:id="@+id/view_flipper"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="10dp">
 
-        <android.support.design.widget.TextInputLayout
-            app:layout_column="1"
-            app:layout_row="0"
-            app:layout_columnWeight="1">
-            <AutoCompleteTextView
-                android:id="@+id/product_name_edit"
+            <android.support.v7.widget.GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/product_name"
+                    app:layout_column="1"
+                    app:layout_row="0"
+                    app:layout_columnWeight="1"
+                    app:layout_gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"/>
+
+                <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    app:layout_column="1"
+                    app:layout_row="1"
+                    app:layout_columnWeight="1"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp">
+                    <TextView
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_weight="0.5"
+                        android:id="@+id/price"/>
+                    <TextView
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_weight="0.5"
+                        android:id="@+id/quantity"/>
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/buy"
+                    android:background="@drawable/ic_shopping_cart_black_36dp"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    app:layout_column="0"
+                    app:layout_row="0"
+                    app:layout_gravity="center"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_column="0"
+                    app:layout_row="1"
+                    app:layout_rowSpan="1"
+                    app:layout_columnWeight="0"
+                    android:layout_marginTop="10dp">
+
+                    <ImageButton
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/edit_button"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginEnd="20dp"
+                        app:layout_gravity="center_vertical"
+                        android:background="@drawable/ic_mode_edit_black_24dp"
+                        android:contentDescription="@string/edit_button" />
+
+                    <ImageButton
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/delete_button"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/ic_delete_black_24dp" />
+
+                </LinearLayout>
+
+
+
+            </android.support.v7.widget.GridLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/shopping_list_product"
-                android:inputType="textAutoComplete"
-                android:imeOptions="actionDone"
-                android:visibility="gone"/>
-        </android.support.design.widget.TextInputLayout>
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/product_name"
-            app:layout_column="1"
-            app:layout_row="0"
-            app:layout_columnWeight="1"
-            app:layout_gravity="center_vertical"
-            android:textSize="20sp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"/>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-        <ImageButton
-            app:layout_column="3"
-            app:layout_row="0"
-            android:visibility="gone"
-            android:id="@+id/clear_product_name"
-            app:layout_gravity="center_vertical"
-            android:background="@drawable/ic_clear_black_24dp"/>
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <AutoCompleteTextView
+                            android:id="@+id/product_name_edit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/shopping_list_product"
+                            android:inputType="textAutoComplete"
+                            android:imeOptions="actionDone" />
+                    </android.support.design.widget.TextInputLayout>
 
-        <ImageButton
-            app:layout_column="3"
-            app:layout_row="1"
-            android:visibility="gone"
-            android:id="@+id/clear_price"
-            app:layout_gravity="center_vertical"
-            android:background="@drawable/ic_clear_black_24dp"/>
+                    <ImageButton
+                        android:id="@+id/clear_product_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right|center_vertical"
+                        android:background="@drawable/ic_clear_black_24dp"/>
 
-        <android.support.design.widget.TextInputLayout
-            app:layout_column="1"
-            app:layout_row="1"
-            app:layout_columnWeight="1">
-            <EditText
-                android:id="@+id/price_edit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/shopping_list_price"
-                android:inputType="numberDecimal"
-                android:imeOptions="actionDone"
-                android:visibility="gone"/>
-        </android.support.design.widget.TextInputLayout>
-
-        <TextView
-            android:id="@+id/price"
-            app:layout_column="1"
-            app:layout_row="1"
-            app:layout_columnWeight="1"
-            app:layout_gravity="center_vertical"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"/>
-
-        <Spinner
-            android:id="@+id/product_category"
-            app:layout_column="1"
-            app:layout_columnSpan="2"
-            app:layout_row="2"
-            app:layout_columnWeight="1"
-            android:visibility="gone">
-
-        </Spinner>
-
-        <CheckBox
-            android:id="@+id/buyCheckBox"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_marginRight="10dp"
-            android:layout_marginEnd="10dp"
-            app:layout_column="0"
-            app:layout_row="0"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_column="0"
-            app:layout_row="1"
-            app:layout_rowSpan="1"
-            app:layout_columnWeight="0"
-            android:layout_marginTop="10dp">
-
-            <ImageButton
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:id="@+id/edit_button"
-                android:layout_marginRight="20dp"
-                android:layout_marginEnd="20dp"
-                app:layout_gravity="center_vertical"
-                android:background="@drawable/ic_mode_edit_black_24dp"
-                android:contentDescription="@string/edit_button" />
-
-            <ImageButton
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:id="@+id/delete_button"
-                android:layout_marginRight="10dp"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/ic_delete_black_24dp" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/done_button"
-            app:layout_row="3"
-            app:layout_column="1"
-            app:layout_gravity="right"
-            android:layout_marginTop="10dp"
-            style="?android:attr/borderlessButtonStyle"
-            android:text="@string/done_button_text"
-            android:visibility="gone"/>
+                </FrameLayout>
 
 
-        </android.support.v7.widget.GridLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <EditText
+                                android:id="@+id/price_edit"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/shopping_list_price"
+                                android:inputType="numberDecimal"
+                                android:imeOptions="actionDone" />
+                        </android.support.design.widget.TextInputLayout>
+
+                        <ImageButton
+                            android:id="@+id/clear_price"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center_vertical"
+                            android:background="@drawable/ic_clear_black_24dp"/>
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5">
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <EditText
+                            android:id="@+id/quantity_edit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/quantity"
+                            android:inputType="numberDecimal"
+                            android:imeOptions="actionDone"/>
+                    </android.support.design.widget.TextInputLayout>
+
+                    <ImageButton
+                        android:id="@+id/clear_quantity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right|center_vertical"
+                        android:background="@drawable/ic_clear_black_24dp"/>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/product_category"
+                    app:layout_column="1"
+                    app:layout_columnSpan="2"
+                    app:layout_row="2"
+                    app:layout_columnWeight="1">
+
+                </Spinner>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="10dp">
+
+                    <Button
+                        android:id="@+id/cancel_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:text="@string/cancel_button"
+                        android:layout_marginRight="10dp"/>
+
+                    <Button
+                        android:id="@+id/done_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:text="@string/done_button_text" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ViewFlipper>
+        
+
     </android.support.v7.widget.CardView>
 
 </LinearLayout>

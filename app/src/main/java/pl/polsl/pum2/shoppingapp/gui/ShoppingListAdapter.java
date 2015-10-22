@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
         void onDeleteButton(View view, int position);
         void onEditButton(View view, int position);
         void onDoneButton(View view, int position);
+        void onCancelButton(View view, int position);
     }
     OnItemClickListener itemClickListener;
 
@@ -35,42 +37,55 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        //CardView mShoppingListItem;
+
+        ViewFlipper viewFlipper;
         AutoCompleteTextView productNameEdit;
         EditText priceEdit;
-        CheckBox buyCheckBox;
+        ImageButton buyButton;
         ImageButton editButton;
         ImageButton deleteButton;
         Button doneButton;
+        Button cancelButton;
         ImageButton clearProductNameButton;
         ImageButton clearPriceButton;
+        ImageButton clearQuantityButton;
         Spinner productCategory;
         TextView productName;
         TextView price;
         OnItemClickListener itemClickListener;
-
+        TextView quantity;
+        EditText quantityEdit;
 
         public ViewHolder(View itemView, OnItemClickListener itemClickListener) {
             super(itemView);
             this.itemClickListener = itemClickListener;
-            //mShoppingListItem = (CardView)itemView.findViewById(R.id.shopping_list_item);
+            viewFlipper = (ViewFlipper)itemView.findViewById(R.id.view_flipper);
             productName = (TextView)itemView.findViewById(R.id.product_name);
             productNameEdit = (AutoCompleteTextView)itemView.findViewById(R.id.product_name_edit);
             price = (TextView)itemView.findViewById(R.id.price);
             priceEdit = (EditText)itemView.findViewById(R.id.price_edit);
-            buyCheckBox = (CheckBox)itemView.findViewById(R.id.buyCheckBox);
+            quantity = (TextView)itemView.findViewById(R.id.quantity);
+            quantityEdit = (EditText)itemView.findViewById(R.id.quantity_edit);
+            buyButton = (ImageButton)itemView.findViewById(R.id.buy);
             editButton = (ImageButton)itemView.findViewById(R.id.edit_button);
             deleteButton = (ImageButton)itemView.findViewById(R.id.delete_button);
             doneButton = (Button)itemView.findViewById(R.id.done_button);
+            cancelButton = (Button)itemView.findViewById(R.id.cancel_button);
             clearProductNameButton = (ImageButton)itemView.findViewById(R.id.clear_product_name);
             clearPriceButton = (ImageButton)itemView.findViewById(R.id.clear_price);
+            clearPriceButton = (ImageButton)itemView.findViewById(R.id.clear_price);
+            clearQuantityButton = (ImageButton)itemView.findViewById(R.id.clear_quantity);
             productCategory = (Spinner)itemView.findViewById(R.id.product_category);
+
+            viewFlipper.setMeasureAllChildren(false);
 
             editButton.setOnClickListener(this);
             doneButton.setOnClickListener(this);
             deleteButton.setOnClickListener(this);
             clearProductNameButton.setOnClickListener(this);
             clearPriceButton.setOnClickListener(this);
+            clearQuantityButton.setOnClickListener(this);
+            cancelButton.setOnClickListener(this);
         }
 
         @Override
@@ -80,15 +95,19 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             switch (viewId) {
                 case R.id.edit_button:
                     itemClickListener.onEditButton(v, position);
-                    setEditMode(true);
+                    viewFlipper.showNext();
                     break;
                 case R.id.done_button:
                     itemClickListener.onDoneButton(v, position);
-                    setEditMode(false);
+                    viewFlipper.showPrevious();
                     insertEditedItemData(position);
                     break;
                 case R.id.delete_button:
                     itemClickListener.onDeleteButton(v, position);
+                    break;
+                case R.id.cancel_button:
+                    itemClickListener.onCancelButton(v, position);
+                    viewFlipper.showPrevious();
                     break;
                 case R.id.clear_product_name:
                     productNameEdit.setText("");
@@ -96,31 +115,12 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
                 case R.id.clear_price:
                     priceEdit.setText("");
                     break;
+                case R.id.clear_quantity:
+                    quantityEdit.setText("");
+                    break;
             }
         }
 
-        private void setEditMode(boolean isEditMode){
-            int normalVisibility;
-            int editVisibility;
-            if (isEditMode) {
-                normalVisibility = View.GONE;
-                editVisibility = View.VISIBLE;
-            } else  {
-                normalVisibility = View.VISIBLE;
-                editVisibility = View.GONE;
-            }
-            productName.setVisibility(normalVisibility);
-            productNameEdit.setVisibility(editVisibility);
-            price.setVisibility(normalVisibility);
-            priceEdit.setVisibility(editVisibility);
-            editButton.setVisibility(normalVisibility);
-            deleteButton.setVisibility(normalVisibility);
-            doneButton.setVisibility(editVisibility);
-            buyCheckBox.setVisibility(normalVisibility);
-            clearProductNameButton.setVisibility(editVisibility);
-            clearPriceButton.setVisibility(editVisibility);
-            productCategory.setVisibility(editVisibility);
-        }
 
         private void insertEditedItemData(int position) {
             ShoppingListItemData item;
@@ -151,11 +151,6 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
         holder.productNameEdit.setText(dataSource.get(position).getProductName());
         holder.price.setText(dataSource.get(position).getPriceString());
         holder.priceEdit.setText(dataSource.get(position).getPriceString());
-        if (dataSource.get(position).getIsBought()) {
-            holder.buyCheckBox.setChecked(true);
-        } else {
-            holder.buyCheckBox.setChecked(false);
-        }
     }
 
     @Override

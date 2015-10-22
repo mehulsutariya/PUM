@@ -70,21 +70,34 @@ public class ShoppingListActivity extends AppCompatActivity implements DeleteIte
 
             @Override
             public void onEditButton(View view, int position) {
-                if(numberOfPositionsInEditMode == 0) {
-                    fab.hide();
-                }
-                numberOfPositionsInEditMode++;
+                setEditMode();
             }
 
             @Override
             public void onDoneButton(View view, int position) {
-                numberOfPositionsInEditMode--;
-                if (numberOfPositionsInEditMode == 0) {
-                    fab.show();
-                }
+                setNormalMode();
+            }
+
+            @Override
+            public void onCancelButton(View view, int position) {
+                setNormalMode();
             }
         });
         shoppingListRecyclerView.setAdapter(shoppingListAdapter);
+    }
+
+    private void setEditMode() {
+        if(numberOfPositionsInEditMode == 0) {
+            fab.hide();
+        }
+        numberOfPositionsInEditMode++;
+    }
+
+    private void setNormalMode() {
+        numberOfPositionsInEditMode--;
+        if (numberOfPositionsInEditMode == 0) {
+            fab.show();
+        }
     }
 
     @Override
