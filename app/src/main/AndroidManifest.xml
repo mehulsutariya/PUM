@@ -9,19 +9,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="pl.polsl.pum2.shoppingapp.gui.ShoppingListActivity"
+            android:name=".gui.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:name=".gui.ShoppingListActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".gui.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pl.polsl.pum2.shoppingapp.gui.MainActivity" />
+        </activity>
+        <activity
             android:name=".gui.AddNewItemsActivity"
             android:label="@string/title_activity_add_new_item"
-            android:parentActivityName="pl.polsl.pum2.shoppingapp.gui.ShoppingListActivity"
+            android:parentActivityName=".gui.ShoppingListActivity"
             android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

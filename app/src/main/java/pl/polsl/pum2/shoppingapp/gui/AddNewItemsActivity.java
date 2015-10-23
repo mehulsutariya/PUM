@@ -8,16 +8,16 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Stack;
 
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
 
 public class AddNewItemsActivity extends AppCompatActivity {
 
-    private List<ShoppingListItemData> shoppingListItemDataArray = new ArrayList<>();
+    private Stack<ShoppingListItemData> listItemDataStack = new Stack<>();
     private NewItemsListAdapter newItemsListAdapter;
+    private RecyclerView newItemsRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +34,11 @@ public class AddNewItemsActivity extends AppCompatActivity {
             }
         });
 
-        RecyclerView newItemsRecyclerView;
         newItemsRecyclerView = (RecyclerView)findViewById(R.id.new_items_list_recycler_view);
         newItemsRecyclerView.setHasFixedSize(true);
         LinearLayoutManager newItemsListLayoutManager = new LinearLayoutManager(this);
         newItemsRecyclerView.setLayoutManager(newItemsListLayoutManager);
-        newItemsListAdapter = new NewItemsListAdapter(shoppingListItemDataArray);
+        newItemsListAdapter = new NewItemsListAdapter(listItemDataStack);
         newItemsRecyclerView.setAdapter(newItemsListAdapter);
         insertNewItem();
 
@@ -47,8 +46,9 @@ public class AddNewItemsActivity extends AppCompatActivity {
     }
 
     private void insertNewItem() {
-        shoppingListItemDataArray.add(new ShoppingListItemData());
-        newItemsListAdapter.notifyItemInserted(shoppingListItemDataArray.size() - 1);
+        listItemDataStack.push(new ShoppingListItemData());
+        newItemsListAdapter.notifyItemInserted(0);
+        newItemsRecyclerView.scrollToPosition(0);
     }
 
     public void addItemButtonClick (View v) {

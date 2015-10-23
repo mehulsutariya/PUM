@@ -3,13 +3,15 @@ package pl.polsl.pum2.shoppingapp.gui;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
@@ -23,27 +25,28 @@ import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
 class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewHolder> {
 
     List<ShoppingListItemData> dataSource;
+    Context context;
 
     public interface OnItemClickListener {
-        void onDeleteButton(View view, int position);
-        void onEditButton(View view, int position);
-        void onDoneButton(View view, int position);
-        void onCancelButton(View view, int position);
+        void onDeleteButton(int position);
+        void onEditButton(int position);
+        void onDoneButton(int position);
+        void onCancelButton(int position);
     }
     OnItemClickListener itemClickListener;
 
-    public ShoppingListAdapter(List<ShoppingListItemData> dataSource) {
+    public ShoppingListAdapter(List<ShoppingListItemData> dataSource, Context context) {
         this.dataSource = dataSource;
+        this.context = context;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
         ViewFlipper viewFlipper;
         AutoCompleteTextView productNameEdit;
         EditText priceEdit;
         ImageButton buyButton;
-        ImageButton editButton;
-        ImageButton deleteButton;
+        ImageButton itemMenuButton;
         Button doneButton;
         Button cancelButton;
         ImageButton clearProductNameButton;
@@ -67,8 +70,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             quantity = (TextView)itemView.findViewById(R.id.quantity);
             quantityEdit = (EditText)itemView.findViewById(R.id.quantity_edit);
             buyButton = (ImageButton)itemView.findViewById(R.id.buy);
-            editButton = (ImageButton)itemView.findViewById(R.id.edit_button);
-            deleteButton = (ImageButton)itemView.findViewById(R.id.delete_button);
+            itemMenuButton = (ImageButton)itemView.findViewById(R.id.item_menu);
             doneButton = (Button)itemView.findViewById(R.id.done_button);
             cancelButton = (Button)itemView.findViewById(R.id.cancel_button);
             clearProductNameButton = (ImageButton)itemView.findViewById(R.id.clear_product_name);
@@ -79,9 +81,8 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
 
             viewFlipper.setMeasureAllChildren(false);
 
-            editButton.setOnClickListener(this);
+            itemMenuButton.setOnClickListener(this);
             doneButton.setOnClickListener(this);
-            deleteButton.setOnClickListener(this);
             clearProductNameButton.setOnClickListener(this);
             clearPriceButton.setOnClickListener(this);
             clearQuantityButton.setOnClickListener(this);
@@ -93,20 +94,20 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             int viewId = v.getId();
             int position = getAdapterPosition();
             switch (viewId) {
-                case R.id.edit_button:
-                    itemClickListener.onEditButton(v, position);
-                    viewFlipper.showNext();
+                case R.id.item_menu:
+                    PopupMenu popup = new PopupMenu(context, v);
+                    MenuInflater inflater = popup.getMenuInflater();
+                    inflater.inflate(R.menu.menu_shopping_list_item, popup.getMenu());
+                    popup.setOnMenuItemClickListener(this);
+                    popup.show();
                     break;
                 case R.id.done_button:
-                    itemClickListener.onDoneButton(v, position);
+                    itemClickListener.onDoneButton(position);
                     viewFlipper.showPrevious();
                     insertEditedItemData(position);
                     break;
-                case R.id.delete_button:
-                    itemClickListener.onDeleteButton(v, position);
-                    break;
                 case R.id.cancel_button:
-                    itemClickListener.onCancelButton(v, position);
+                    itemClickListener.onCancelButton(position);
                     viewFlipper.showPrevious();
                     break;
                 case R.id.clear_product_name:
@@ -121,8 +122,21 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             }
         }
 
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.edit:
+                    itemClickListener.onEditButton(getAdapterPosition());
+                    viewFlipper.showNext();
+                    break;
+                case R.id.delete:
+                    itemClickListener.onDeleteButton(getAdapterPosition());
+                    break;
+            }
+            return false;
+        }
 
-        private void insertEditedItemData(int position) {
+            private void insertEditedItemData(int position) {
             ShoppingListItemData item;
             item = dataSource.get(getAdapterPosition());
             item.setProductName(productNameEdit.getText().toString());
@@ -131,6 +145,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             } else {
                 item.setPriceValue(0.0);
             }
+            item.setQuantity(Integer.parseInt(quantityEdit.getText().toString()));
             dataSource.set(position, item);
             notifyItemChanged(position);
         }
@@ -151,6 +166,8 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
         holder.productNameEdit.setText(dataSource.get(position).getProductName());
         holder.price.setText(dataSource.get(position).getPriceString());
         holder.priceEdit.setText(dataSource.get(position).getPriceString());
+        holder.quantity.setText("x" + dataSource.get(position).getQuantityString());
+        holder.quantityEdit.setText(dataSource.get(position).getQuantityString());
     }
 
     @Override

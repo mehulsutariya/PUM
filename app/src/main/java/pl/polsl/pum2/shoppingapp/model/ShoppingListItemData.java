@@ -4,17 +4,19 @@ public class ShoppingListItemData {
     private String productName;
     private String productCategory;
     private Double priceValue;
+    private Integer quantity;
     private boolean isBought;
 
-    public ShoppingListItemData(String productName, String productCategory, double priceValue, boolean isBought) {
+    public ShoppingListItemData(String productName, String productCategory, double priceValue, int quantity,boolean isBought) {
         this.productName = productName;
         this.productCategory = productCategory;
         this.priceValue = priceValue;
+        this.quantity = quantity;
         this.isBought = isBought;
     }
 
     public ShoppingListItemData(){
-        this("", "", 0.0, false);
+        this("", "", 0.0, 1, false);
     }
 
     public String getProductName() {
@@ -31,6 +33,14 @@ public class ShoppingListItemData {
 
     public void setProductCategory(String productCategory) {
         this.productCategory = productCategory;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getQuantityString(){
+        return quantity.toString();
     }
 
     public String getPriceString() {

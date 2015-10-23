@@ -25,7 +25,7 @@
                     android:id="@+id/product_name"
                     app:layout_column="1"
                     app:layout_row="0"
-                    app:layout_columnWeight="1"
+                    app:layout_columnWeight="0.80"
                     app:layout_gravity="center_vertical"
                     android:textSize="20sp"
                     android:layout_marginLeft="10dp"
@@ -33,64 +33,44 @@
 
                 <LinearLayout
                     android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     app:layout_column="1"
                     app:layout_row="1"
-                    app:layout_columnWeight="1"
+                    app:layout_columnWeight="0.80"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp">
                     <TextView
                         android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        android:layout_weight="0.5"
-                        android:id="@+id/price"/>
+                        android:layout_width="wrap_content"
+                        android:id="@+id/price"
+                        android:layout_marginRight="5dp"/>
                     <TextView
                         android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        android:layout_weight="0.5"
+                        android:layout_width="wrap_content"
                         android:id="@+id/quantity"/>
                 </LinearLayout>
 
                 <ImageButton
                     android:id="@+id/buy"
-                    android:background="@drawable/ic_shopping_cart_black_36dp"
+                    android:background="@drawable/rounded_button"
+                    android:src="@drawable/ic_add_shopping_cart_white_24dp"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:layout_marginRight="10dp"
                     android:layout_marginEnd="10dp"
                     app:layout_column="0"
                     app:layout_row="0"
+                    app:layout_rowSpan="2"
                     app:layout_gravity="center"/>
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <ImageButton
+                    android:id="@+id/item_menu"
+                    android:background="@drawable/ic_more_vert_black_24dp"
                     android:layout_height="wrap_content"
-                    app:layout_column="0"
-                    app:layout_row="1"
-                    app:layout_rowSpan="1"
-                    app:layout_columnWeight="0"
-                    android:layout_marginTop="10dp">
-
-                    <ImageButton
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:id="@+id/edit_button"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginEnd="20dp"
-                        app:layout_gravity="center_vertical"
-                        android:background="@drawable/ic_mode_edit_black_24dp"
-                        android:contentDescription="@string/edit_button" />
-
-                    <ImageButton
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:id="@+id/delete_button"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:background="@drawable/ic_delete_black_24dp" />
-
-                </LinearLayout>
-
+                    android:layout_width="wrap_content"
+                    app:layout_column="2"
+                    app:layout_row="0"
+                    app:layout_columnWeight="0"/>
 
 
             </android.support.v7.widget.GridLayout>
@@ -207,14 +187,18 @@
                         android:layout_height="wrap_content"
                         style="?android:attr/borderlessButtonStyle"
                         android:text="@string/cancel_button"
-                        android:layout_marginRight="10dp"/>
+                        android:layout_marginRight="15dp"
+                        android:textColor="@color/colorPrimary"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
                     <Button
                         android:id="@+id/done_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="?android:attr/borderlessButtonStyle"
-                        android:text="@string/done_button_text" />
+                        android:text="@string/done_button_text"
+                        android:textColor="@color/colorPrimary"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
                 </LinearLayout>
 
