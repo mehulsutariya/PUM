@@ -47,6 +47,10 @@ public class ShoppingListItemData {
         return priceValue.toString();
     }
 
+    public double getPrice() {
+        return priceValue;
+    }
+
     public void setPriceValue(double priceValue) {
         this.priceValue = priceValue;
     }

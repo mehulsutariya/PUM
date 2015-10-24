@@ -16,6 +16,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import java.text.NumberFormat;
+import java.util.Currency;
 import java.util.List;
 
 import pl.polsl.pum2.shoppingapp.R;
@@ -164,7 +166,9 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.productName.setText(dataSource.get(position).getProductName());
         holder.productNameEdit.setText(dataSource.get(position).getProductName());
-        holder.price.setText(dataSource.get(position).getPriceString());
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
+        String priceText = numberFormat.format(dataSource.get(position).getPrice());
+        holder.price.setText(priceText);
         holder.priceEdit.setText(dataSource.get(position).getPriceString());
         holder.quantity.setText("x" + dataSource.get(position).getQuantityString());
         holder.quantityEdit.setText(dataSource.get(position).getQuantityString());

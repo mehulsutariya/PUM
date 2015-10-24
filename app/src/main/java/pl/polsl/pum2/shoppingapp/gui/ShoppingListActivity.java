@@ -75,17 +75,19 @@ public class ShoppingListActivity extends AppCompatActivity implements DeleteIte
 
             @Override
             public void onEditButton(int position) {
-                enterEditMode();
+                //enterEditMode();
             }
 
             @Override
             public void onDoneButton(int position) {
-                exitEditMode();
+                //exitEditMode();
+                fab.show();
             }
 
             @Override
             public void onCancelButton(int position) {
-                exitEditMode();
+                //exitEditMode();
+                fab.show();
             }
         });
         shoppingListRecyclerView.setAdapter(shoppingListAdapter);
@@ -136,10 +138,11 @@ public class ShoppingListActivity extends AppCompatActivity implements DeleteIte
     public void onDialogPositiveClick(DialogFragment dialog) {
         shoppingListItemDataArray.remove(positionOfItemToDelete);
         shoppingListAdapter.notifyItemRemoved(positionOfItemToDelete);
+        fab.show();
     }
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
-
+        fab.show();
     }
 }
