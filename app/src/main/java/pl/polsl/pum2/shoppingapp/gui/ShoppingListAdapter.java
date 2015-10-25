@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import java.text.NumberFormat;
-import java.util.Currency;
 import java.util.List;
 
 import pl.polsl.pum2.shoppingapp.R;
@@ -97,11 +96,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             int position = getAdapterPosition();
             switch (viewId) {
                 case R.id.item_menu:
-                    PopupMenu popup = new PopupMenu(context, v);
-                    MenuInflater inflater = popup.getMenuInflater();
-                    inflater.inflate(R.menu.menu_shopping_list_item, popup.getMenu());
-                    popup.setOnMenuItemClickListener(this);
-                    popup.show();
+                    showPopupMenu(v);
                     break;
                 case R.id.done_button:
                     itemClickListener.onDoneButton(position);
@@ -124,6 +119,14 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             }
         }
 
+        private void showPopupMenu(View v) {
+            PopupMenu popup = new PopupMenu(context, v);
+            MenuInflater inflater = popup.getMenuInflater();
+            inflater.inflate(R.menu.menu_shopping_list_item, popup.getMenu());
+            popup.setOnMenuItemClickListener(this);
+            popup.show();
+        }
+
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
@@ -138,7 +141,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             return false;
         }
 
-            private void insertEditedItemData(int position) {
+        private void insertEditedItemData(int position) {
             ShoppingListItemData item;
             item = dataSource.get(getAdapterPosition());
             item.setProductName(productNameEdit.getText().toString());
@@ -170,8 +173,8 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
         String priceText = numberFormat.format(dataSource.get(position).getPrice());
         holder.price.setText(priceText);
         holder.priceEdit.setText(dataSource.get(position).getPriceString());
-        holder.quantity.setText("x" + dataSource.get(position).getQuantityString());
-        holder.quantityEdit.setText(dataSource.get(position).getQuantityString());
+        holder.quantity.setText("x" + dataSource.get(position).getQuantity());
+        holder.quantityEdit.setText(Integer.toString(dataSource.get(position).getQuantity()));
     }
 
     @Override

@@ -3,6 +3,7 @@ package pl.polsl.pum2.shoppingapp.gui;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,20 +26,66 @@ import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
 public class ShoppingListActivity extends AppCompatActivity implements DeleteItemDialogFragment.DeleteItemDialogListener {
 
     private ShoppingListAdapter shoppingListAdapter;
-    private List<ShoppingListItemData> shoppingListItemDataArray = new ArrayList<>();
+    RecyclerView shoppingListRecyclerView;
+    private List<ShoppingListItemData> shoppingListItemDataArray;
     private FloatingActionButton fab;
-    private int numberOfPositionsInEditMode = 0;
     private int positionOfItemToDelete;
+    private int numberOfPositionsInEditMode;
+    CoordinatorLayout.LayoutParams fabLayoutParams;
+    CoordinatorLayout.Behavior defaultFABBehavior;
+    CoordinatorLayout.Behavior scrollFABBehavior;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_shopping_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setToolbar();
+        setFloatingActionButton();
+        setRecyclerView();
+        numberOfPositionsInEditMode = 0;
+    }
 
+    private void setRecyclerView() {
+        shoppingListRecyclerView = (RecyclerView) findViewById(R.id.shopping_list_recycler_view);
+        shoppingListRecyclerView.setHasFixedSize(true);
+
+        RecyclerView.LayoutManager shoppingListLayoutManager;
+        shoppingListLayoutManager = new LinearLayoutManager(this);
+        shoppingListRecyclerView.setLayoutManager(shoppingListLayoutManager);
+
+        setRecyclerViewAdapter();
+    }
+
+    private void setRecyclerViewAdapter() {
+        shoppingListItemDataArray = new ArrayList<>();
+        shoppingListAdapter = new ShoppingListAdapter(shoppingListItemDataArray, this);
+        shoppingListAdapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
+
+            @Override
+            public void onDeleteButton(int position) {
+                DialogFragment newFragment = new DeleteItemDialogFragment();
+                newFragment.show(getFragmentManager(), "deleteItemDialogTag");
+                positionOfItemToDelete = position;
+            }
+
+            @Override
+            public void onEditButton(int position) {
+                enterEditMode();
+            }
+
+            @Override
+            public void onDoneButton(int position) {
+                exitEditMode();
+            }
+
+            @Override
+            public void onCancelButton(int position) {
+                exitEditMode();
+            }
+        });
+        shoppingListRecyclerView.setAdapter(shoppingListAdapter);
+    }
+
+    private void setFloatingActionButton() {
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,56 +102,44 @@ public class ShoppingListActivity extends AppCompatActivity implements DeleteIte
                         .setAction("Action", null).show();
             }
         });
+        setFABLayoutParams();
+    }
 
-        RecyclerView shoppingListRecyclerView;
-        shoppingListRecyclerView = (RecyclerView) findViewById(R.id.shopping_list_recycler_view);
-        shoppingListRecyclerView.setHasFixedSize(true);
+    private void setFABLayoutParams() {
+        fabLayoutParams = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+        defaultFABBehavior = fabLayoutParams.getBehavior();
+        scrollFABBehavior = new ScrollFABBehavior(this,null);
+        fabLayoutParams.setBehavior(scrollFABBehavior);
+    }
 
-        RecyclerView.LayoutManager shoppingListLayoutManager;
-        shoppingListLayoutManager = new LinearLayoutManager(this);
-        shoppingListRecyclerView.setLayoutManager(shoppingListLayoutManager);
-
-        shoppingListAdapter = new ShoppingListAdapter(shoppingListItemDataArray, this);
-        shoppingListAdapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
-
-            @Override
-            public void onDeleteButton(int position) {
-                DialogFragment newFragment = new DeleteItemDialogFragment();
-                newFragment.show(getFragmentManager(), "deleteItemDialogTag");
-                positionOfItemToDelete = position;
-            }
-
-            @Override
-            public void onEditButton(int position) {
-                //enterEditMode();
-            }
-
-            @Override
-            public void onDoneButton(int position) {
-                //exitEditMode();
-                fab.show();
-            }
-
-            @Override
-            public void onCancelButton(int position) {
-                //exitEditMode();
-                fab.show();
-            }
-        });
-        shoppingListRecyclerView.setAdapter(shoppingListAdapter);
+    private void setToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void enterEditMode() {
-        if(numberOfPositionsInEditMode == 0) {
+        if (numberOfPositionsInEditMode == 0) {
+            fabLayoutParams.setBehavior(defaultFABBehavior);
             fab.hide();
         }
         numberOfPositionsInEditMode++;
     }
 
     private void exitEditMode() {
+        hideSoftKeyboard();
         numberOfPositionsInEditMode--;
         if (numberOfPositionsInEditMode == 0) {
             fab.show();
+            fabLayoutParams.setBehavior(scrollFABBehavior);
+        }
+    }
+
+    private void hideSoftKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
     }
 

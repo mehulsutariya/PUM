@@ -39,8 +39,8 @@ public class ShoppingListItemData {
         this.quantity = quantity;
     }
 
-    public String getQuantityString(){
-        return quantity.toString();
+    public int getQuantity(){
+        return quantity;
     }
 
     public String getPriceString() {

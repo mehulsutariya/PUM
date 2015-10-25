@@ -53,7 +53,6 @@
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin" app:layout_anchor="@id/coordinator_layout"
         app:layout_anchorGravity="bottom|end" android:src="@drawable/ic_add_white_36dp"
-        app:fabSize="normal"
-        app:layout_behavior="pl.polsl.pum2.shoppingapp.gui.ScrollFABBehavior"/>
+        app:fabSize="normal" />
 
 </android.support.design.widget.CoordinatorLayout>

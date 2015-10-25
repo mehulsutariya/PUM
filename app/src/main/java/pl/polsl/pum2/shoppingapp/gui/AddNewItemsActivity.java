@@ -15,7 +15,7 @@ import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
 
 public class AddNewItemsActivity extends AppCompatActivity {
 
-    private Stack<ShoppingListItemData> listItemDataStack = new Stack<>();
+    private Stack<ShoppingListItemData> listItemDataStack;
     private NewItemsListAdapter newItemsListAdapter;
     private RecyclerView newItemsRecyclerView;
 
@@ -25,6 +25,7 @@ public class AddNewItemsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_new_item);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        listItemDataStack = new Stack<>();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
