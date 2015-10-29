@@ -33,6 +33,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
         void onEditButton(int position);
         void onDoneButton(int position);
         void onCancelButton(int position);
+        void onBuyButton(int position);
     }
     OnItemClickListener itemClickListener;
 
@@ -88,6 +89,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             clearPriceButton.setOnClickListener(this);
             clearQuantityButton.setOnClickListener(this);
             cancelButton.setOnClickListener(this);
+            buyButton.setOnClickListener(this);
         }
 
         @Override
@@ -115,6 +117,9 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
                     break;
                 case R.id.clear_quantity:
                     quantityEdit.setText("");
+                    break;
+                case R.id.buy:
+                    itemClickListener.onBuyButton(position);
                     break;
             }
         }
