@@ -18,7 +18,7 @@
     <string name="quantity">Ilość</string>
 
     <!-- Okno dialogowe przy usuwaniu pozycji z listy: -->
-    <string name="delete_dialog_message">Usunąć pozycję?</string>
+    <string name="delete_dialog_message">Czy usunąć produkt &lt;b>%s&lt;/b>?</string>
     <string name="delete">Usuń</string>
     <string name="cancel_button">Anuluj</string>
     <string name="title_activity_main">MainActivity</string>

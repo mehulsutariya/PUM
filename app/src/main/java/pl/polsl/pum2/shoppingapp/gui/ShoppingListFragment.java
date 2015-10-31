@@ -3,13 +3,7 @@ package pl.polsl.pum2.shoppingapp.gui;
 import android.app.Activity;
 import android.support.v4.app.DialogFragment;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,6 +26,7 @@ public class ShoppingListFragment extends Fragment {
     private int positionOfItemToDelete;
     private int numberOfPositionsInEditMode;
     private Activity activity;
+    private int listType;
 
     public interface OnFragmentInteractionListener {
         void onEnterEditMode();
@@ -60,16 +55,15 @@ public class ShoppingListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setRetainInstance(true);
         activity = getActivity();
         shoppingListItemDataArray = new ArrayList<>();
+        listType = getArguments().getInt("ListType");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shopping_list, container, false);
-        shoppingListRecyclerView = (RecyclerView)view.findViewById(R.id.shopping_list_recycler_view);
-        setRecyclerView();
+        setRecyclerView(view);
         return view;
     }
 
@@ -81,7 +75,8 @@ public class ShoppingListFragment extends Fragment {
     }
 
 
-    private void setRecyclerView() {
+    private void setRecyclerView(View view) {
+        shoppingListRecyclerView = (RecyclerView)view.findViewById(R.id.shopping_list_recycler_view);
         shoppingListRecyclerView.setHasFixedSize(true);
 
         RecyclerView.LayoutManager shoppingListLayoutManager;
@@ -93,13 +88,16 @@ public class ShoppingListFragment extends Fragment {
 
 
     private void setRecyclerViewAdapter() {
-        shoppingListAdapter = new ShoppingListAdapter(shoppingListItemDataArray, getContext());
+        shoppingListAdapter = new ShoppingListAdapter(shoppingListItemDataArray, getContext(), listType);
         shoppingListAdapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
 
             @Override
             public void onDeleteButton(int position) {
                 DialogFragment deleteItemDialogFragment = new DeleteItemDialogFragment();
                 deleteItemDialogFragment.setTargetFragment(ShoppingListFragment.this, 1);
+                Bundle arguments = new Bundle();
+                arguments.putString("ProductName", shoppingListAdapter.getItemName(position));
+                deleteItemDialogFragment.setArguments(arguments);
                 deleteItemDialogFragment.show(getActivity().getSupportFragmentManager(), "deleteItemDialogTag");
                 positionOfItemToDelete = position;
             }
@@ -132,8 +130,6 @@ public class ShoppingListFragment extends Fragment {
     private void enterEditMode() {
         if (numberOfPositionsInEditMode == 0) {
             listener.onEnterEditMode();
-            //fabLayoutParams.setBehavior(defaultFABBehavior);
-            //fab.hide();
         }
         numberOfPositionsInEditMode++;
     }
@@ -142,8 +138,6 @@ public class ShoppingListFragment extends Fragment {
         hideSoftKeyboard();
         numberOfPositionsInEditMode--;
         if (numberOfPositionsInEditMode == 0) {
-            //fab.show();
-            //fabLayoutParams.setBehavior(scrollFABBehavior);
             listener.onExitEditMode();
         }
     }
@@ -159,12 +153,10 @@ public class ShoppingListFragment extends Fragment {
     void removeItem() {
         shoppingListItemDataArray.remove(positionOfItemToDelete);
         shoppingListAdapter.notifyItemRemoved(positionOfItemToDelete);
-        //fab.show();
         listener.onItemRemoved();
     }
 
     void cancelItemRemoving(){
-        //fab.show();
         listener.onItemRemovingCanceled();
     }
 

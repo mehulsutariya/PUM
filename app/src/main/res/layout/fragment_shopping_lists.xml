@@ -3,10 +3,9 @@
     android:layout_height="match_parent"
     tools:context="pl.polsl.pum2.shoppingapp.gui.ShoppingListsFragment">
 
-    <RecyclerView
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </RecyclerView>
+        android:layout_height="match_parent"
+        android:text="Listy zakupów"/>
 
 </FrameLayout>

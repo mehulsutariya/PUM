@@ -28,6 +28,9 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     private Fragment currentTabFragment;
     private PagerAdapter pagerAdapter;
 
+    final static int SHOPPING_LIST = 0;
+    final static int CART = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,12 +51,7 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
                 (getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 if (position == 0) {
@@ -61,11 +59,6 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
                 } else {
                     fab.hide();
                 }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
             }
         });
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

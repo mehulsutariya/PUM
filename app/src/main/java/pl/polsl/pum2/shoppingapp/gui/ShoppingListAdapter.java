@@ -25,8 +25,9 @@ import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
 
 class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewHolder> {
 
-    List<ShoppingListItemData> dataSource;
-    Context context;
+    private List<ShoppingListItemData> dataSource;
+    private Context context;
+    private int listType;
 
     public interface OnItemClickListener {
         void onDeleteButton(int position);
@@ -37,9 +38,10 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
     }
     OnItemClickListener itemClickListener;
 
-    public ShoppingListAdapter(List<ShoppingListItemData> dataSource, Context context) {
+    public ShoppingListAdapter(List<ShoppingListItemData> dataSource, Context context, int listType) {
         this.dataSource = dataSource;
         this.context = context;
+        this.listType = listType;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
@@ -90,6 +92,9 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             clearQuantityButton.setOnClickListener(this);
             cancelButton.setOnClickListener(this);
             buyButton.setOnClickListener(this);
+            if (listType == ShoppingListActivity.CART) {
+                buyButton.setVisibility(View.GONE);
+            }
         }
 
         @Override
@@ -190,6 +195,10 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
 
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
+    }
+
+    public String getItemName(int position) {
+        return dataSource.get(position).getProductName();
     }
 
 }

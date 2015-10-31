@@ -1,9 +1,10 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
 public class PagerAdapter extends FragmentPagerAdapter {
@@ -17,15 +18,23 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-
         switch (position) {
             case 0:
-                return new ShoppingListFragment();
+                return getFragment(ShoppingListActivity.SHOPPING_LIST);
             case 1:
-                return new ShoppingCartFragment();
+                return getFragment(ShoppingListActivity.CART);
             default:
                 return null;
         }
+    }
+
+    @NonNull
+    private Fragment getFragment(int type) {
+        Bundle arguments = new Bundle();
+        ShoppingListFragment fragment = new ShoppingListFragment();
+        arguments.putInt("ListType", type);
+        fragment.setArguments(arguments);
+        return fragment;
     }
 
     @Override
