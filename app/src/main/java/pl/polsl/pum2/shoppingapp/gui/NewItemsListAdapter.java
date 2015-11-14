@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 
 import java.util.List;
@@ -26,12 +27,22 @@ public class NewItemsListAdapter extends RecyclerView.Adapter<NewItemsListAdapte
         EditText productName;
         Spinner productCategory;
         EditText price;
+        ImageButton deleteItemButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             productName = (EditText)itemView.findViewById(R.id.product_name);
             productCategory = (Spinner)itemView.findViewById(R.id.product_category);
             price = (EditText)itemView.findViewById(R.id.price);
+            deleteItemButton = (ImageButton)itemView.findViewById(R.id.delete_item_button);
+            deleteItemButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    dataSource.remove(position);
+                    notifyItemRemoved(position);
+                }
+            });
         }
     }
 
@@ -44,7 +55,7 @@ public class NewItemsListAdapter extends RecyclerView.Adapter<NewItemsListAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.productName.setText(dataSource.get(position).getProductName());
         //TODO holder.productCategory
         if (dataSource.get(position).getPriceString().equals("0.0")) { //do poprawki
@@ -52,6 +63,7 @@ public class NewItemsListAdapter extends RecyclerView.Adapter<NewItemsListAdapte
         } else {
             holder.price.setText(dataSource.get(position).getPriceString());
         }
+
     }
 
     @Override

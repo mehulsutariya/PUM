@@ -8,17 +8,34 @@
         android:orientation="vertical"
         android:layout_margin="10dp">
 
-        <android.support.design.widget.TextInputLayout
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent">
-            <AutoCompleteTextView
-                android:id="@+id/product_name"
-                android:layout_width="match_parent"
+            android:orientation="horizontal">
+
+            <android.support.design.widget.TextInputLayout
                 android:layout_height="wrap_content"
-                android:hint="@string/shopping_list_product"
-                android:inputType="textAutoComplete"
-                android:imeOptions="actionDone" />
-        </android.support.design.widget.TextInputLayout>
+                android:layout_width="0dp"
+                android:layout_weight="0.80">
+                <AutoCompleteTextView
+                    android:id="@+id/product_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/shopping_list_product"
+                    android:inputType="textAutoComplete"
+                    android:imeOptions="actionDone" />
+            </android.support.design.widget.TextInputLayout>
+
+            <ImageButton
+                android:id="@+id/delete_item_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.20"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/image_button_background_grey"
+                android:src="@drawable/ic_delete_black_24dp" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -51,10 +68,29 @@
 
         </LinearLayout>
 
-        <Spinner
-            android:id="@+id/product_category"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></Spinner>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/product_category"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.80">
+            </Spinner>
+
+            <ImageButton
+                android:id="@+id/add_category_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.20"
+                android:src="@drawable/ic_add_black_24dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/image_button_background_grey"/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

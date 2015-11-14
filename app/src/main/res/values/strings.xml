@@ -13,8 +13,8 @@
     <string name="category">Kategoria</string>
 
     <!-- Dodawanie produktów do listy -->
-    <string name="title_activity_add_new_item">Dodaj nowe produkty</string>
-    <string name="add_item_button">Dodaj kolejny produkt</string>
+    <string name="title_activity_add_new_item">Dodawanie nowych produktów</string>
+    <string name="add_item_button">Dodaj produkt</string>
     <string name="quantity">Ilość</string>
 
     <!-- Okno dialogowe przy usuwaniu pozycji z listy: -->
@@ -31,10 +31,13 @@
     <string name="categories">Kategorie produktów</string>
     <string name="market_maps">Mapy sklepów</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string name="shopping_list_tab">Lista zakupów</string>
     <string name="shopping_cart_tab">Koszyk</string>
+    <string name="title_activity_create_or_edit_list">Tworzenie listy</string>
+    <string name="shopping_list_name">Nazwa listy</string>
+    <string name="market_map">Mapa sklepu</string>
+    <string name="new_map_button">Utwórz nową mapę</string>
+    <string name="edit_map_button">Edytuj mapę</string>
+    <string name="add_products_button">Edytuj listę</string>
 
 </resources>

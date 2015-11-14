@@ -35,12 +35,12 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
-        setToolbar();
-        setTabLayout();
-        setFloatingActionButton();
+        setupToolbar();
+        setupTabLayout();
+        setupFloatingActionButton();
     }
 
-    private void setTabLayout() {
+    private void setupTabLayout() {
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.shopping_list_tab)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.shopping_cart_tab)));
@@ -80,28 +80,32 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     }
 
 
-    private void setToolbar() {
+    private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private void setFloatingActionButton() {
+    private void setupFloatingActionButton() {
         fab = (FloatingActionButton)findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Tymczasowo:
-                ShoppingListItemData data = new ShoppingListItemData("nowy produkt", "Kategoria1", 1.0, 1, false);
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        ShoppingListActivity.this, fab, "transition_add_new_items");
-                ActivityCompat.startActivity(ShoppingListActivity.this, new Intent(ShoppingListActivity.this, AddNewItemsActivity.class),
-                        options.toBundle());
+                        ShoppingListActivity.this, fab, "transition_create_or_edit_list");
+                Intent intent =  new Intent(ShoppingListActivity.this, CreateOrEditListActivity.class);
+                intent.putExtra("pl.polsl.pum2.shoppingapp.gui.mode", CreateOrEditListActivity.ADD_LIST_ITEMS);
+                ActivityCompat.startActivity(ShoppingListActivity.this, intent, options.toBundle());
+
+                //TODO: Tymczasowo, później do usunięcia:--------------------------------------------------------
+                ShoppingListItemData data = new ShoppingListItemData("nowy produkt", "Kategoria1", 1.0, 1, false);
                 currentTabFragment = pagerAdapter.getCurrentFragment();
                 if(currentTabFragment instanceof ShoppingListFragment) {
                     ShoppingListFragment fragment = (ShoppingListFragment)currentTabFragment;
                     fragment.addNewItem(data);
                 }
+                //------------------------------------------------------------------------------------------------
+
                 Snackbar.make(view, getString(R.string.product_added), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -115,8 +119,6 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
         scrollFABBehavior = new ScrollFABBehavior(this, null);
         fabLayoutParams.setBehavior(scrollFABBehavior);
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

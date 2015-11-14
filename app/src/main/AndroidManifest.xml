@@ -14,6 +14,7 @@
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -27,13 +28,18 @@
                 android:value="pl.polsl.pum2.shoppingapp.gui.MainActivity" />
         </activity>
         <activity
-            android:name=".gui.AddNewItemsActivity"
+            android:name=".gui.AddNewItemsFragment"
             android:label="@string/title_activity_add_new_item"
             android:parentActivityName=".gui.ShoppingListActivity"
             android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".gui.ShoppingListActivity" />
+        </activity>
+        <activity
+            android:name=".gui.CreateOrEditListActivity"
+            android:label="@string/title_activity_create_or_edit_list"
+            android:theme="@style/AppTheme.NoActionBar" >
         </activity>
     </application>
 

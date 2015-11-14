@@ -1,11 +1,18 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="pl.polsl.pum2.shoppingapp.gui.ShoppingListsFragment">
+    tools:context="pl.polsl.pum2.shoppingapp.gui.ShoppingListsFragment"
+    android:orientation="vertical">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Listy zakupów"/>
 
-</FrameLayout>
+    <Button
+        android:id="@+id/tmpButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Przejdź do listy"/>
+
+</LinearLayout>
