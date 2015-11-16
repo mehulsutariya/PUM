@@ -39,5 +39,7 @@
     <string name="new_map_button">Utwórz nową mapę</string>
     <string name="edit_map_button">Edytuj mapę</string>
     <string name="add_products_button">Edytuj listę</string>
+    <string name="new_list_form_message">Najpierw wprowadź nazwę listy i&#160;wybierz mapę sklepu.</string>
+    <string name="ok_button">OK</string>
 
 </resources>

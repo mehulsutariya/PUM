@@ -41,6 +41,8 @@
             android:label="@string/title_activity_create_or_edit_list"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity android:name=".gui.CreateOrEditMarketMapActivity" >
+        </activity>
     </application>
 
 </manifest>

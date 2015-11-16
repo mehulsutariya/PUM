@@ -1,6 +1,6 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;

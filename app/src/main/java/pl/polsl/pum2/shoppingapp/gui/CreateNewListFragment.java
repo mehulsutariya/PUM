@@ -38,12 +38,27 @@ public class CreateNewListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_create_new_list, container, false);
         listName = (EditText)view.findViewById(R.id.shopping_list_name);
         Button newMarketMapButton = (Button)view.findViewById(R.id.newMarketMapButton);
+        newMarketMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createOrEditMarketMap();
+            }
+        });
+        Button editMarketMapButton = (Button)view.findViewById(R.id.editMarketMapButton);
+        editMarketMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createOrEditMarketMap();
+            }
+        });
         Button doneButton = (Button)view.findViewById(R.id.done_button);
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isFormComplete()) {
                     getActivity().finish();
+                } else {
+                    showMessageDialog();
                 }
             }
         });
@@ -53,10 +68,25 @@ public class CreateNewListFragment extends Fragment {
             public void onClick(View v) {
                 if (isFormComplete()) {
                     listener.onEditList();
+                } else {
+                    showMessageDialog();
                 }
             }
         });
         return view;
+    }
+
+    private void createOrEditMarketMap() {
+        Intent intent = new Intent(getActivity(), CreateOrEditMarketMapActivity.class);
+        getActivity().startActivity(intent);
+    }
+
+    private void showMessageDialog() {
+        MessageDialogFragment messageDialogFragment = new MessageDialogFragment();
+        Bundle message = new Bundle();
+        message.putString("Message", getString(R.string.new_list_form_message));
+        messageDialogFragment.setArguments(message);
+        messageDialogFragment.show(getActivity().getSupportFragmentManager(), "messageDialogTag");
     }
 
     @Override
