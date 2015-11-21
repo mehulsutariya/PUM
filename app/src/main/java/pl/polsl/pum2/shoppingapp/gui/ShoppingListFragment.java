@@ -1,9 +1,9 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
 import android.app.Activity;
-import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,8 +30,11 @@ public class ShoppingListFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onEnterEditMode();
+
         void onExitEditMode();
+
         void onItemRemoved();
+
         void onItemRemovingCanceled();
     }
 
@@ -76,7 +79,7 @@ public class ShoppingListFragment extends Fragment {
 
 
     private void setRecyclerView(View view) {
-        shoppingListRecyclerView = (RecyclerView)view.findViewById(R.id.shopping_list_recycler_view);
+        shoppingListRecyclerView = (RecyclerView) view.findViewById(R.id.shopping_list_recycler_view);
         shoppingListRecyclerView.setHasFixedSize(true);
 
         RecyclerView.LayoutManager shoppingListLayoutManager;
@@ -143,9 +146,9 @@ public class ShoppingListFragment extends Fragment {
     }
 
     private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+        if (imm.isAcceptingText()) { // verify if the soft keyboard is open
             imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
         }
     }
@@ -156,7 +159,7 @@ public class ShoppingListFragment extends Fragment {
         listener.onItemRemoved();
     }
 
-    void cancelItemRemoving(){
+    void cancelItemRemoving() {
         listener.onItemRemovingCanceled();
     }
 

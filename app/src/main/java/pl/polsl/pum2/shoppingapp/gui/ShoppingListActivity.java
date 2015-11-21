@@ -12,8 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import pl.polsl.pum2.shoppingapp.R;
@@ -41,12 +39,12 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     }
 
     private void setupTabLayout() {
-        TabLayout tabLayout = (TabLayout)findViewById(R.id.tab_layout);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.shopping_list_tab)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.shopping_cart_tab)));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        final ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         pagerAdapter = new PagerAdapter
                 (getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
@@ -55,7 +53,7 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
             @Override
             public void onPageSelected(int position) {
                 if (position == 0) {
-                    fab.show();
+                    showFloatingActionButton();
                 } else {
                     fab.hide();
                 }
@@ -79,6 +77,14 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
         });
     }
 
+    private void showFloatingActionButton() {
+        fab.show();
+        //korekta pozycji,
+        //bez tego floating action button pojawia się w złym miejscu,
+        // gdy został ukryty przy widocznym snackbarze
+        fab.setTranslationY(0.0f);
+    }
+
 
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -87,21 +93,21 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     }
 
     private void setupFloatingActionButton() {
-        fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                         ShoppingListActivity.this, fab, "transition_create_or_edit_list");
-                Intent intent =  new Intent(ShoppingListActivity.this, CreateOrEditListActivity.class);
-                intent.putExtra("pl.polsl.pum2.shoppingapp.gui.mode", CreateOrEditListActivity.ADD_LIST_ITEMS);
+                Intent intent = new Intent(ShoppingListActivity.this, ShoppingListEditorActivity.class);
+                intent.putExtra(ShoppingListEditorActivity.MODE, ShoppingListEditorActivity.ADD_LIST_ITEMS);
                 ActivityCompat.startActivity(ShoppingListActivity.this, intent, options.toBundle());
 
                 //TODO: Tymczasowo, później do usunięcia:--------------------------------------------------------
                 ShoppingListItemData data = new ShoppingListItemData("nowy produkt", "Kategoria1", 1.0, 1, false);
                 currentTabFragment = pagerAdapter.getCurrentFragment();
-                if(currentTabFragment instanceof ShoppingListFragment) {
-                    ShoppingListFragment fragment = (ShoppingListFragment)currentTabFragment;
+                if (currentTabFragment instanceof ShoppingListFragment) {
+                    ShoppingListFragment fragment = (ShoppingListFragment) currentTabFragment;
                     fragment.addNewItem(data);
                 }
                 //------------------------------------------------------------------------------------------------
@@ -116,29 +122,8 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     private void setFABLayoutParams() {
         fabLayoutParams = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
         defaultFABBehavior = fabLayoutParams.getBehavior();
-        scrollFABBehavior = new ScrollFABBehavior(this, null);
+        scrollFABBehavior = new ScrollFabBehavior();
         fabLayoutParams.setBehavior(scrollFABBehavior);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_shopping_list, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -155,18 +140,18 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
 
     @Override
     public void onExitEditMode() {
-        fab.show();
+        showFloatingActionButton();
         fabLayoutParams.setBehavior(scrollFABBehavior);
     }
 
     @Override
     public void onItemRemoved() {
-        fab.show();
+        showFloatingActionButton();
     }
 
     @Override
     public void onItemRemovingCanceled() {
-        fab.show();
+        showFloatingActionButton();
     }
 
 }

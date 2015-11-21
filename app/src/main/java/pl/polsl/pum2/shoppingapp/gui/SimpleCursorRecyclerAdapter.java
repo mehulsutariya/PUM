@@ -38,7 +38,7 @@ public class SimpleCursorRecyclerAdapter extends CursorRecyclerAdapter<SimpleVie
     private int[] mTo;
     private String[] mOriginalFrom;
 
-    public SimpleCursorRecyclerAdapter (int layout, Cursor c, String[] from, int[] to) {
+    public SimpleCursorRecyclerAdapter(int layout, Cursor c, String[] from, int[] to) {
         super(c);
         mLayout = layout;
         mTo = to;
@@ -47,14 +47,14 @@ public class SimpleCursorRecyclerAdapter extends CursorRecyclerAdapter<SimpleVie
     }
 
     @Override
-    public SimpleViewHolder onCreateViewHolder (ViewGroup parent, int viewType) {
+    public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(mLayout, parent, false);
         return new SimpleViewHolder(v, mTo);
     }
 
     @Override
-    public void onBindViewHolder (SimpleViewHolder holder, Cursor cursor) {
+    public void onBindViewHolder(SimpleViewHolder holder, Cursor cursor) {
         final int count = mTo.length;
         final int[] from = mFrom;
 
@@ -67,7 +67,7 @@ public class SimpleCursorRecyclerAdapter extends CursorRecyclerAdapter<SimpleVie
      * Create a map from an array of strings to an array of column-id integers in cursor c.
      * If c is null, the array will be discarded.
      *
-     * @param c the cursor to find the columns from
+     * @param c    the cursor to find the columns from
      * @param from the Strings naming the columns of interest
      */
     private void findColumns(Cursor c, String[] from) {
@@ -92,15 +92,13 @@ public class SimpleCursorRecyclerAdapter extends CursorRecyclerAdapter<SimpleVie
     }
 }
 
-class SimpleViewHolder extends RecyclerView.ViewHolder
-{
+class SimpleViewHolder extends RecyclerView.ViewHolder {
     public TextView[] views;
 
-    public SimpleViewHolder (View itemView, int[] to)
-    {
+    public SimpleViewHolder(View itemView, int[] to) {
         super(itemView);
         views = new TextView[to.length];
-        for(int i = 0 ; i < to.length ; i++) {
+        for (int i = 0; i < to.length; i++) {
             views[i] = (TextView) itemView.findViewById(to[i]);
         }
     }

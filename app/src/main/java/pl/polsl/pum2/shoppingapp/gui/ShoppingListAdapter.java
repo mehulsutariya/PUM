@@ -31,11 +31,16 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
 
     public interface OnItemClickListener {
         void onDeleteButton(int position);
+
         void onEditButton(int position);
+
         void onDoneButton(int position);
+
         void onCancelButton(int position);
+
         void onBuyButton(int position);
     }
+
     OnItemClickListener itemClickListener;
 
     public ShoppingListAdapter(List<ShoppingListItemData> dataSource, Context context, int listType) {
@@ -66,22 +71,22 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
         public ViewHolder(View itemView, OnItemClickListener itemClickListener) {
             super(itemView);
             this.itemClickListener = itemClickListener;
-            viewFlipper = (ViewFlipper)itemView.findViewById(R.id.view_flipper);
-            productName = (TextView)itemView.findViewById(R.id.product_name);
-            productNameEdit = (AutoCompleteTextView)itemView.findViewById(R.id.product_name_edit);
-            price = (TextView)itemView.findViewById(R.id.price);
-            priceEdit = (EditText)itemView.findViewById(R.id.price_edit);
-            quantity = (TextView)itemView.findViewById(R.id.quantity);
-            quantityEdit = (EditText)itemView.findViewById(R.id.quantity_edit);
-            buyButton = (ImageButton)itemView.findViewById(R.id.buy);
-            itemMenuButton = (ImageButton)itemView.findViewById(R.id.item_menu);
-            doneButton = (Button)itemView.findViewById(R.id.done_button);
-            cancelButton = (Button)itemView.findViewById(R.id.cancel_button);
-            clearProductNameButton = (ImageButton)itemView.findViewById(R.id.clear_product_name);
-            clearPriceButton = (ImageButton)itemView.findViewById(R.id.clear_price);
-            clearPriceButton = (ImageButton)itemView.findViewById(R.id.clear_price);
-            clearQuantityButton = (ImageButton)itemView.findViewById(R.id.clear_quantity);
-            productCategory = (Spinner)itemView.findViewById(R.id.product_category);
+            viewFlipper = (ViewFlipper) itemView.findViewById(R.id.view_flipper);
+            productName = (TextView) itemView.findViewById(R.id.product_name);
+            productNameEdit = (AutoCompleteTextView) itemView.findViewById(R.id.product_name_edit);
+            price = (TextView) itemView.findViewById(R.id.price);
+            priceEdit = (EditText) itemView.findViewById(R.id.price_edit);
+            quantity = (TextView) itemView.findViewById(R.id.quantity);
+            quantityEdit = (EditText) itemView.findViewById(R.id.quantity_edit);
+            buyButton = (ImageButton) itemView.findViewById(R.id.buy);
+            itemMenuButton = (ImageButton) itemView.findViewById(R.id.item_menu);
+            doneButton = (Button) itemView.findViewById(R.id.done_button);
+            cancelButton = (Button) itemView.findViewById(R.id.cancel_button);
+            clearProductNameButton = (ImageButton) itemView.findViewById(R.id.clear_product_name);
+            clearPriceButton = (ImageButton) itemView.findViewById(R.id.clear_price);
+            clearPriceButton = (ImageButton) itemView.findViewById(R.id.clear_price);
+            clearQuantityButton = (ImageButton) itemView.findViewById(R.id.clear_quantity);
+            productCategory = (Spinner) itemView.findViewById(R.id.product_category);
 
             viewFlipper.setMeasureAllChildren(false);
 
@@ -156,9 +161,9 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             item = dataSource.get(getAdapterPosition());
             item.setProductName(productNameEdit.getText().toString());
             if (priceEdit.getText().length() > 0) {
-                item.setPriceValue(Double.parseDouble(priceEdit.getText().toString()));
+                item.setPrice(Double.parseDouble(priceEdit.getText().toString()));
             } else {
-                item.setPriceValue(0.0);
+                item.setPrice(0.0);
             }
             item.setQuantity(Integer.parseInt(quantityEdit.getText().toString()));
             dataSource.set(position, item);
@@ -183,8 +188,8 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
         String priceText = numberFormat.format(dataSource.get(position).getPrice());
         holder.price.setText(priceText);
         holder.priceEdit.setText(dataSource.get(position).getPriceString());
-        holder.quantity.setText("x" + dataSource.get(position).getQuantity());
-        holder.quantityEdit.setText(Integer.toString(dataSource.get(position).getQuantity()));
+        holder.quantity.setText(String.format(context.getString(R.string.quantity_string), dataSource.get(position).getQuantity()));
+        holder.quantityEdit.setText(String.format("%d", dataSource.get(position).getQuantity()));
     }
 
     @Override

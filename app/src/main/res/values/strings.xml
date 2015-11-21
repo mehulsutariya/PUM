@@ -3,7 +3,7 @@
     <string name="action_settings">Settings</string>
 
     <!-- Lista zakupów -->
-    <string name="shopping_list_product">Produkt</string>
+    <string name="shopping_list_product">Nazwa produktu</string>
     <string name="shopping_list_price">Cena</string>
     <string name="done_button_text">Gotowe</string>
     <string name="edit">Edytuj</string>
@@ -41,5 +41,14 @@
     <string name="add_products_button">Edytuj listę</string>
     <string name="new_list_form_message">Najpierw wprowadź nazwę listy i&#160;wybierz mapę sklepu.</string>
     <string name="ok_button">OK</string>
+    <string name="title_activity_create_or_edit_map">Edycja mapy</string>
+    <string name="map_name">Nazwa mapy</string>
+    <string name="add_category">Dodaj kategorię</string>
+    <string name="map_form_message">Najpierw wprowadź nazwę mapy.</string>
 
+    <string name="buy_button_content_description">Kup</string>
+    <string name="menu_button_content_description">Menu</string>
+    <string name="clear_button_content_description">Wyczyść</string>
+    <string name="new_items_fragment_message">Wprowadź wymagane dane:\n\t&#8226; nazwę produktu,\n\t&#8226; ilość,\n\t&#8226; kategorię.</string>
+    <string name="quantity_string">x%1s</string>
 </resources>

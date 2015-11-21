@@ -9,9 +9,6 @@ import android.view.ViewGroup;
 
 import pl.polsl.pum2.shoppingapp.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class MarketMapsFragment extends Fragment {
 
 

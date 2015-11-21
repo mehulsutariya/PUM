@@ -13,9 +13,10 @@ import android.widget.EditText;
 import pl.polsl.pum2.shoppingapp.R;
 
 
-public class CreateNewListFragment extends Fragment {
+public class ListEditorFragment extends Fragment {
 
-    EditText listName;
+    private static final String MESSAGE_DIALOG_TAG = "pl.polsl.pum2.shoppingapp.gui.ListEditorFragment.messageDialogTag";
+    private EditText listName;
 
     public interface OnFragmentInteractionListener {
         void onEditList();
@@ -23,7 +24,7 @@ public class CreateNewListFragment extends Fragment {
 
     OnFragmentInteractionListener listener;
 
-    public CreateNewListFragment() {
+    public ListEditorFragment() {
         // Required empty public constructor
     }
 
@@ -35,38 +36,38 @@ public class CreateNewListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_create_new_list, container, false);
-        listName = (EditText)view.findViewById(R.id.shopping_list_name);
-        Button newMarketMapButton = (Button)view.findViewById(R.id.newMarketMapButton);
+        View view = inflater.inflate(R.layout.fragment_list_editor, container, false);
+        listName = (EditText) view.findViewById(R.id.shopping_list_name);
+        Button newMarketMapButton = (Button) view.findViewById(R.id.newMarketMapButton);
         newMarketMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createOrEditMarketMap();
             }
         });
-        Button editMarketMapButton = (Button)view.findViewById(R.id.editMarketMapButton);
+        Button editMarketMapButton = (Button) view.findViewById(R.id.editMarketMapButton);
         editMarketMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createOrEditMarketMap();
             }
         });
-        Button doneButton = (Button)view.findViewById(R.id.done_button);
+        Button doneButton = (Button) view.findViewById(R.id.done_button);
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isFormComplete()) {
+                if (formIsCompleted()) {
                     getActivity().finish();
                 } else {
                     showMessageDialog();
                 }
             }
         });
-        Button addProductsButton = (Button)view.findViewById(R.id.add_products_button);
+        Button addProductsButton = (Button) view.findViewById(R.id.add_products_button);
         addProductsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isFormComplete()) {
+                if (formIsCompleted()) {
                     listener.onEditList();
                 } else {
                     showMessageDialog();
@@ -77,16 +78,16 @@ public class CreateNewListFragment extends Fragment {
     }
 
     private void createOrEditMarketMap() {
-        Intent intent = new Intent(getActivity(), CreateOrEditMarketMapActivity.class);
+        Intent intent = new Intent(getActivity(), MarketMapEditorActivity.class);
         getActivity().startActivity(intent);
     }
 
     private void showMessageDialog() {
         MessageDialogFragment messageDialogFragment = new MessageDialogFragment();
         Bundle message = new Bundle();
-        message.putString("Message", getString(R.string.new_list_form_message));
+        message.putString(MessageDialogFragment.MESSAGE, getString(R.string.new_list_form_message));
         messageDialogFragment.setArguments(message);
-        messageDialogFragment.show(getActivity().getSupportFragmentManager(), "messageDialogTag");
+        messageDialogFragment.show(getActivity().getSupportFragmentManager(), MESSAGE_DIALOG_TAG);
     }
 
     @Override
@@ -106,13 +107,9 @@ public class CreateNewListFragment extends Fragment {
         listener = null;
     }
 
-    boolean isFormComplete() {
+    boolean formIsCompleted() {
         //TODO: sprawdzanie stanu spinnera
-        if (listName.length() == 0) {
-            return false;
-        }
-        return true;
+        return listName.length() != 0;
     }
-
 
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<navigationModel
+  ns = "http://schemas.android.com?import=com.android.tools.idea.editors.navigation.model.*">
+  <locations  
+    class = "java.util.ArrayList">
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "pl.polsl.pum2.shoppingapp.gui.CreateOrEditListActivity"/>
+      <point      
+        x = "436"      
+        y = "176"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "pl.polsl.pum2.shoppingapp.gui.ShoppingListActivity"/>
+      <point      
+        x = "550"      
+        y = "150"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "pl.polsl.pum2.shoppingapp.gui.CreateOrEditMarketMapActivity"/>
+      <point      
+        x = "600"      
+        y = "200"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "pl.polsl.pum2.shoppingapp.gui.MainActivity"/>
+      <point      
+        x = "650"      
+        y = "250"/>
+    </statePointEntry>
+  </locations>
+</navigationModel>

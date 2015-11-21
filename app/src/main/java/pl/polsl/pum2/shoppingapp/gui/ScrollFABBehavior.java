@@ -1,17 +1,11 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
-import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
-import android.util.AttributeSet;
 import android.view.View;
 
-public class ScrollFABBehavior  extends FloatingActionButton.Behavior {
-
-    public ScrollFABBehavior(Context context, AttributeSet attrs) {
-        super();
-    }
+public class ScrollFabBehavior extends FloatingActionButton.Behavior {
 
 
     @Override
@@ -25,6 +19,7 @@ public class ScrollFABBehavior  extends FloatingActionButton.Behavior {
     @Override
     public void onNestedScroll(CoordinatorLayout coordinatorLayout, FloatingActionButton child,
                                View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
+
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed,
                 dyUnconsumed);
 

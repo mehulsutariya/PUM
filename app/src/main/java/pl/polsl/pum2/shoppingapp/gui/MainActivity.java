@@ -1,33 +1,37 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
 import pl.polsl.pum2.shoppingapp.R;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    ShoppingListsFragment shoppingListsFragment;
-    ProductsFragment productsFragment;
-    ProductCategoriesFragment productCategoriesFragment;
-    MarketMapsFragment marketMapsFragment;
-    FragmentManager fragmentManager;
-    FragmentTransaction fragmentTransaction;
-    int navigationViewCheckedItem;
+    private static final String SHOPPING_LISTS_FRAGMENT = "shoppingListsFragment";
+    private static final String PRODUCTS_FRAGMENT = "productsFragment";
+    private static final String PRODUCT_CATEGORIES_FRAGMENT = "productCategoriesFragment";
+    private static final String MARKET_MAPS_FRAGMENT = "marketMapsFragment";
+    private static final String NAVIGATION_VIEW_CHECKED_ITEM = "navigationViewCheckedItem";
+    private AllShoppingListsFragment allShoppingListsFragment;
+    private ProductsFragment productsFragment;
+    private ProductCategoriesFragment productCategoriesFragment;
+    private MarketMapsFragment marketMapsFragment;
+    private FragmentManager fragmentManager;
+    private int navigationViewCheckedItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +39,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (savedInstanceState != null) {
-            navigationViewCheckedItem = savedInstanceState.getInt("navigationViewCheckedItem");
+            navigationViewCheckedItem = savedInstanceState.getInt(NAVIGATION_VIEW_CHECKED_ITEM);
         } else {
             navigationViewCheckedItem = R.id.nav_shopping_lists;
         }
@@ -50,7 +54,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), CreateOrEditListActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ShoppingListEditorActivity.class);
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                         MainActivity.this, fab, "transition_create_or_edit_list");
                 ActivityCompat.startActivity(MainActivity.this, intent, options.toBundle());
@@ -72,19 +76,19 @@ public class MainActivity extends AppCompatActivity
 
     private void setupFragments() {
         fragmentManager = getSupportFragmentManager();
-        shoppingListsFragment = (ShoppingListsFragment)fragmentManager.findFragmentByTag("shoppingListsFragment");
-        if (shoppingListsFragment == null) {
-            shoppingListsFragment = new ShoppingListsFragment();
+        allShoppingListsFragment = (AllShoppingListsFragment) fragmentManager.findFragmentByTag(SHOPPING_LISTS_FRAGMENT);
+        if (allShoppingListsFragment == null) {
+            allShoppingListsFragment = new AllShoppingListsFragment();
         }
-        productsFragment = (ProductsFragment)fragmentManager.findFragmentByTag("productsFragment");
+        productsFragment = (ProductsFragment) fragmentManager.findFragmentByTag(PRODUCTS_FRAGMENT);
         if (productsFragment == null) {
             productsFragment = new ProductsFragment();
         }
-        productCategoriesFragment = (ProductCategoriesFragment)fragmentManager.findFragmentByTag("productCategoriesFragment");
+        productCategoriesFragment = (ProductCategoriesFragment) fragmentManager.findFragmentByTag(PRODUCT_CATEGORIES_FRAGMENT);
         if (productCategoriesFragment == null) {
             productCategoriesFragment = new ProductCategoriesFragment();
         }
-        marketMapsFragment = (MarketMapsFragment)fragmentManager.findFragmentByTag("marketMapsFragment");
+        marketMapsFragment = (MarketMapsFragment) fragmentManager.findFragmentByTag(MARKET_MAPS_FRAGMENT);
         if (marketMapsFragment == null) {
             marketMapsFragment = new MarketMapsFragment();
         }
@@ -92,22 +96,29 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setCurrentFragment() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        switch (navigationViewCheckedItem){
+        Fragment newFragment = null;
+        String tag = null;
+        switch (navigationViewCheckedItem) {
             case R.id.nav_shopping_lists:
-                fragmentTransaction.replace(R.id.fragment_container, shoppingListsFragment, "shoppingListsFragment");
+                newFragment = allShoppingListsFragment;
+                tag = SHOPPING_LISTS_FRAGMENT;
                 break;
             case R.id.nav_products:
-                fragmentTransaction.replace(R.id.fragment_container, productsFragment, "productsFragment");
+                newFragment = productsFragment;
+                tag = PRODUCTS_FRAGMENT;
                 break;
             case R.id.nav_categories:
-                fragmentTransaction.replace(R.id.fragment_container, productCategoriesFragment, "productCategoriesFragment");
+                newFragment = productCategoriesFragment;
+                tag = PRODUCT_CATEGORIES_FRAGMENT;
                 break;
             case R.id.nav_market_maps:
-                fragmentTransaction.replace(R.id.fragment_container, marketMapsFragment, "marketMapsFragment");
+                newFragment = marketMapsFragment;
+                tag = MARKET_MAPS_FRAGMENT;
                 break;
         }
-        fragmentTransaction.commit();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, newFragment, tag)
+                .commit();
     }
 
     @Override
@@ -133,6 +144,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("navigationViewCheckedItem", navigationViewCheckedItem);
+        outState.putInt(NAVIGATION_VIEW_CHECKED_ITEM, navigationViewCheckedItem);
     }
 }

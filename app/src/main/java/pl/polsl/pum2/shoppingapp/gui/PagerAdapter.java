@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
 public class PagerAdapter extends FragmentPagerAdapter {
-    int numOfTabs;
+    private int numOfTabs;
     private Fragment currentFragment;
 
     public PagerAdapter(FragmentManager fm, int numOfTabs) {
@@ -38,9 +38,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public void setPrimaryItem (ViewGroup container, int position, Object object) {
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
         super.setPrimaryItem(container, position, object);
-        currentFragment = (Fragment)object;
+        currentFragment = (Fragment) object;
     }
 
     @Override

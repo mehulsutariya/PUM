@@ -29,7 +29,7 @@
                     app:layout_gravity="center_vertical"
                     android:textSize="20sp"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"/>
+                    android:layout_marginStart="10dp" />
 
                 <LinearLayout
                     android:layout_height="wrap_content"
@@ -39,15 +39,18 @@
                     app:layout_columnWeight="0.80"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp">
+
                     <TextView
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:id="@+id/price"
-                        android:layout_marginRight="5dp"/>
+                        android:layout_marginRight="5dp"
+                        android:layout_marginEnd="5dp" />
+
                     <TextView
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:id="@+id/quantity"/>
+                        android:id="@+id/quantity" />
                 </LinearLayout>
 
                 <ImageButton
@@ -58,11 +61,12 @@
                     android:layout_width="wrap_content"
                     android:layout_marginRight="10dp"
                     android:layout_marginEnd="10dp"
+                    android:contentDescription="@string/buy_button_content_description"
                     app:layout_column="0"
                     app:layout_columnWeight="0.04"
                     app:layout_row="0"
                     app:layout_rowSpan="2"
-                    app:layout_gravity="center"/>
+                    app:layout_gravity="center" />
 
                 <ImageButton
                     android:id="@+id/item_menu"
@@ -70,6 +74,7 @@
                     android:background="@drawable/image_button_background_grey"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
+                    android:contentDescription="@string/menu_button_content_description"
                     app:layout_column="2"
                     app:layout_row="0" />
 
@@ -88,6 +93,7 @@
                     <android.support.design.widget.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <AutoCompleteTextView
                             android:id="@+id/product_name_edit"
                             android:layout_width="match_parent"
@@ -101,9 +107,10 @@
                         android:id="@+id/clear_product_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="right|center_vertical"
+                        android:layout_gravity="end|center_vertical"
                         android:src="@drawable/ic_clear_black_24dp"
-                        android:background="@drawable/image_button_background_grey"/>
+                        android:background="@drawable/image_button_background_grey"
+                        android:contentDescription="@string/clear_button_content_description" />
 
                 </FrameLayout>
 
@@ -111,7 +118,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
 
                     <FrameLayout
                         android:layout_width="wrap_content"
@@ -121,6 +129,7 @@
                         <android.support.design.widget.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
+
                             <EditText
                                 android:id="@+id/price_edit"
                                 android:layout_width="match_parent"
@@ -134,34 +143,38 @@
                             android:id="@+id/clear_price"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="right|center_vertical"
+                            android:layout_gravity="end|center_vertical"
                             android:src="@drawable/ic_clear_black_24dp"
-                            android:background="@drawable/image_button_background_grey"/>
+                            android:background="@drawable/image_button_background_grey"
+                            android:contentDescription="@string/clear_button_content_description" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5">
-                    <android.support.design.widget.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <EditText
-                            android:id="@+id/quantity_edit"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/quantity"
-                            android:inputType="numberDecimal"
-                            android:imeOptions="actionDone"/>
-                    </android.support.design.widget.TextInputLayout>
 
-                    <ImageButton
-                        android:id="@+id/clear_quantity"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right|center_vertical"
-                        android:src="@drawable/ic_clear_black_24dp"
-                        android:background="@drawable/image_button_background_grey"/>
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <EditText
+                                android:id="@+id/quantity_edit"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/quantity"
+                                android:inputType="numberDecimal"
+                                android:imeOptions="actionDone" />
+                        </android.support.design.widget.TextInputLayout>
+
+                        <ImageButton
+                            android:id="@+id/clear_quantity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end|center_vertical"
+                            android:src="@drawable/ic_clear_black_24dp"
+                            android:background="@drawable/image_button_background_grey"
+                            android:contentDescription="@string/clear_button_content_description" />
 
                     </FrameLayout>
 
@@ -182,7 +195,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
+                    android:layout_gravity="end"
                     android:layout_marginTop="10dp">
 
                     <Button
@@ -192,6 +205,7 @@
                         style="?android:attr/borderlessButtonStyle"
                         android:text="@string/cancel_button"
                         android:layout_marginRight="15dp"
+                        android:layout_marginEnd="15dp"
                         android:textColor="@color/colorPrimary"
                         android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
@@ -209,7 +223,7 @@
             </LinearLayout>
 
         </ViewFlipper>
-        
+
 
     </android.support.v7.widget.CardView>
 
