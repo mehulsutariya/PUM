@@ -13,13 +13,15 @@ import pl.polsl.pum2.shoppingapp.R;
 
 public class DeleteItemDialogFragment extends DialogFragment {
 
+    public static final String PRODUCT_NAME = "ProductName";
+
     @Override
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final ShoppingListFragment targetFragment = (ShoppingListFragment) getTargetFragment();
         Bundle arguments = getArguments();
-        String productName = arguments.getString("ProductName");
+        String productName = arguments.getString(PRODUCT_NAME);
         if (productName == null) {
             productName = "";
         }
