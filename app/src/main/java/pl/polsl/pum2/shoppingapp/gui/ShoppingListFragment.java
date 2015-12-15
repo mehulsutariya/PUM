@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,36 +11,37 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import io.realm.RealmChangeListener;
+import io.realm.RealmList;
 import pl.polsl.pum2.shoppingapp.R;
-import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
+import pl.polsl.pum2.shoppingapp.database.ShoppingList;
+import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
-public class ShoppingListFragment extends Fragment {
+public class ShoppingListFragment extends BaseRealmFragment {
 
+    private static final String LIST_NAME = "listName";
+    private OnFragmentInteractionListener listener;
     private RecyclerView shoppingListRecyclerView;
     private ShoppingListAdapter shoppingListAdapter;
-    private List<ShoppingListItemData> shoppingListItemDataArray;
+    private ShoppingList shoppingList;
     private int positionOfItemToDelete;
     private int numberOfPositionsInEditMode;
     private Activity activity;
     private int listType;
-
-    public interface OnFragmentInteractionListener {
-        void onEnterEditMode();
-
-        void onExitEditMode();
-
-        void onItemRemoved();
-
-        void onItemRemovingCanceled();
-    }
-
-    OnFragmentInteractionListener listener;
+    private String listName;
+    private RealmList<ShoppingListItem> listItems;
+    private RealmChangeListener realmChangeListener;
 
     public ShoppingListFragment() {
         // Required empty public constructor
+    }
+
+    public static ShoppingListFragment newInstance(String listName) {
+        ShoppingListFragment fragment = new ShoppingListFragment();
+        Bundle arguments = new Bundle();
+        arguments.putString(LIST_NAME, listName);
+        fragment.setArguments(arguments);
+        return fragment;
     }
 
     @Override
@@ -59,8 +59,17 @@ public class ShoppingListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = getActivity();
-        shoppingListItemDataArray = new ArrayList<>();
+        listName = getArguments().getString(LIST_NAME);
+        shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
+        listItems = shoppingList.getItems();
         listType = getArguments().getInt("ListType");
+        realmChangeListener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                shoppingListAdapter.notifyDataSetChanged();
+            }
+        };
+        shoppingList.addChangeListener(realmChangeListener);
     }
 
     @Override
@@ -70,13 +79,11 @@ public class ShoppingListFragment extends Fragment {
         return view;
     }
 
-
     @Override
     public void onDetach() {
         super.onDetach();
         listener = null;
     }
-
 
     private void setRecyclerView(View view) {
         shoppingListRecyclerView = (RecyclerView) view.findViewById(R.id.shopping_list_recycler_view);
@@ -89,9 +96,8 @@ public class ShoppingListFragment extends Fragment {
         setRecyclerViewAdapter();
     }
 
-
     private void setRecyclerViewAdapter() {
-        shoppingListAdapter = new ShoppingListAdapter(shoppingListItemDataArray, getContext(), listType);
+        shoppingListAdapter = new ShoppingListAdapter(listItems, getContext(), listType);
         shoppingListAdapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
 
             @Override
@@ -122,9 +128,8 @@ public class ShoppingListFragment extends Fragment {
 
             @Override
             public void onBuyButton(int position) {
-                //TODO tymczasowo usuwa pozycję:
-                shoppingListItemDataArray.remove(position);
-                shoppingListAdapter.notifyItemRemoved(position);
+                //TODO:
+
             }
         });
         shoppingListRecyclerView.setAdapter(shoppingListAdapter);
@@ -154,7 +159,12 @@ public class ShoppingListFragment extends Fragment {
     }
 
     void removeItem() {
-        shoppingListItemDataArray.remove(positionOfItemToDelete);
+        realm.beginTransaction();
+        RealmList<ShoppingListItem> listItems = shoppingList.getItems();
+        ShoppingListItem itemToDelete = listItems.get(positionOfItemToDelete);
+        itemToDelete.removeFromRealm();
+        listItems.clear();
+        realm.commitTransaction();
         shoppingListAdapter.notifyItemRemoved(positionOfItemToDelete);
         listener.onItemRemoved();
     }
@@ -163,9 +173,14 @@ public class ShoppingListFragment extends Fragment {
         listener.onItemRemovingCanceled();
     }
 
-    public void addNewItem(ShoppingListItemData itemData) {
-        shoppingListItemDataArray.add(itemData);
-        shoppingListAdapter.notifyItemInserted(shoppingListItemDataArray.size() - 1);
+    public interface OnFragmentInteractionListener {
+        void onEnterEditMode();
+
+        void onExitEditMode();
+
+        void onItemRemoved();
+
+        void onItemRemovingCanceled();
     }
 
 }

@@ -3,26 +3,23 @@ package pl.polsl.pum2.shoppingapp.gui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import io.realm.Realm;
+import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
+import pl.polsl.pum2.shoppingapp.database.ShoppingList;
 
 
-public class ListEditorFragment extends Fragment {
+public class ListEditorFragment extends BaseRealmFragment {
 
     private static final String MESSAGE_DIALOG_TAG = "pl.polsl.pum2.shoppingapp.gui.ListEditorFragment.messageDialogTag";
-    private EditText listName;
-
-    public interface OnFragmentInteractionListener {
-        void onEditList();
-    }
-
     OnFragmentInteractionListener listener;
+    private EditText listName;
 
     public ListEditorFragment() {
         // Required empty public constructor
@@ -57,6 +54,7 @@ public class ListEditorFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (formIsCompleted()) {
+                    saveList();
                     getActivity().finish();
                 } else {
                     showMessageDialog();
@@ -68,6 +66,9 @@ public class ListEditorFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (formIsCompleted()) {
+                    saveList();
+                    ShoppingListEditorActivity activity = (ShoppingListEditorActivity) getActivity();
+                    activity.setListName(listName.getText().toString());
                     listener.onEditList();
                 } else {
                     showMessageDialog();
@@ -75,6 +76,21 @@ public class ListEditorFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private void saveList() {
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    ShoppingList list = realm.createObject(ShoppingList.class);
+                    list.setName(listName.getText().toString());
+                }
+            });
+        } catch (RealmPrimaryKeyConstraintException e) {
+            //TODO
+        }
+
     }
 
     private void createOrEditMarketMap() {
@@ -110,6 +126,10 @@ public class ListEditorFragment extends Fragment {
     boolean formIsCompleted() {
         //TODO: sprawdzanie stanu spinnera
         return listName.length() != 0;
+    }
+
+    public interface OnFragmentInteractionListener {
+        void onEditList();
     }
 
 }

@@ -9,13 +9,6 @@ import pl.polsl.pum2.shoppingapp.R;
 
 public class MarketMapContentAdapter extends RecyclerView.Adapter<MarketMapContentAdapter.ViewHolder> {
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-        }
-    }
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -31,6 +24,13 @@ public class MarketMapContentAdapter extends RecyclerView.Adapter<MarketMapConte
     @Override
     public int getItemCount() {
         return 0;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+        }
     }
 }
 

@@ -13,44 +13,18 @@ import android.widget.Spinner;
 
 import java.util.List;
 
+import io.realm.Realm;
 import pl.polsl.pum2.shoppingapp.R;
-import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
+import pl.polsl.pum2.shoppingapp.database.Product;
+import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
 
 public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditorAdapter.ViewHolder> {
 
-    private List<ShoppingListItemData> dataSource;
+    private List<ShoppingListItem> dataSource;
 
-    ListItemsEditorAdapter(List<ShoppingListItemData> dataSource) {
+    ListItemsEditorAdapter(List<ShoppingListItem> dataSource) {
         this.dataSource = dataSource;
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        EditText productName;
-        Spinner productCategory;
-        EditText price;
-        EditText quantity;
-        ImageButton deleteItemButton;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            productName = (EditText) itemView.findViewById(R.id.product_name);
-            productCategory = (Spinner) itemView.findViewById(R.id.product_category);
-            price = (EditText) itemView.findViewById(R.id.price);
-            quantity = (EditText) itemView.findViewById(R.id.quantity);
-            deleteItemButton = (ImageButton) itemView.findViewById(R.id.delete_item_button);
-            deleteItemButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    dataSource.remove(position);
-                    notifyItemRemoved(position);
-                }
-            });
-            productName.addTextChangedListener(new TextListener(TextListener.PRODUCT_NAME, this));
-            price.addTextChangedListener(new TextListener(TextListener.PRICE, this));
-            quantity.addTextChangedListener(new TextListener(TextListener.QUANTITY, this));
-        }
     }
 
     @Override
@@ -63,7 +37,10 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        holder.productName.setText(dataSource.get(position).getProductName());
+        Product product = dataSource.get(position).getProduct();
+        if (product != null) {
+            holder.productName.setText(product.getName());
+        }
         //TODO holder.productCategory
         if (dataSource.get(position).getPrice() == 0.0) {
             holder.price.setText("");
@@ -81,6 +58,34 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
     @Override
     public int getItemCount() {
         return dataSource.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        EditText productName;
+        Spinner productCategory;
+        EditText price;
+        EditText quantity;
+        ImageButton deleteItemButton;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            productName = (EditText) itemView.findViewById(R.id.item_name);
+            productCategory = (Spinner) itemView.findViewById(R.id.product_category);
+            price = (EditText) itemView.findViewById(R.id.price);
+            quantity = (EditText) itemView.findViewById(R.id.quantity);
+            deleteItemButton = (ImageButton) itemView.findViewById(R.id.delete_item_button);
+            deleteItemButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    dataSource.remove(position);
+                    notifyItemRemoved(position);
+                }
+            });
+            productName.addTextChangedListener(new TextListener(TextListener.PRODUCT_NAME, this));
+            price.addTextChangedListener(new TextListener(TextListener.PRICE, this));
+            quantity.addTextChangedListener(new TextListener(TextListener.QUANTITY, this));
+        }
     }
 
     class TextListener implements TextWatcher {
@@ -110,11 +115,19 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
 
         @Override
         public void afterTextChanged(Editable s) {
-            ShoppingListItemData item = dataSource.get(viewHolder.getAdapterPosition());
+            ShoppingListItem item = dataSource.get(viewHolder.getAdapterPosition());
+            Realm realm = Realm.getDefaultInstance();
             try {
                 switch (type) {
                     case PRODUCT_NAME:
-                        item.setProductName(s.toString());
+                        Product product = item.getProduct();
+                        if (product == null) {
+                            product = new Product();
+                        }
+                        realm.beginTransaction();
+                        product.setName(s.toString());
+                        realm.commitTransaction();
+                        item.setProduct(product);
                         break;
                     case PRICE:
                         item.setPrice(Double.parseDouble(s.toString()));
@@ -130,6 +143,7 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
                     item.setQuantity(0);
                 }
             }
+            dataSource.set(viewHolder.getAdapterPosition(), item);
         }
     }
 }

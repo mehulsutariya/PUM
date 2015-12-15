@@ -17,17 +17,61 @@ import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import java.text.NumberFormat;
-import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmList;
 import pl.polsl.pum2.shoppingapp.R;
-import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
+import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
 
 class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewHolder> {
 
-    private List<ShoppingListItemData> dataSource;
+    OnItemClickListener itemClickListener;
+    private RealmList<ShoppingListItem> listItems;
     private Context context;
     private int listType;
+
+    public ShoppingListAdapter(RealmList<ShoppingListItem> listItems, Context context, int listType) {
+        this.listItems = listItems;
+        this.context = context;
+        this.listType = listType;
+    }
+
+    @Override
+    public ShoppingListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View shoppingListView = inflater.inflate(R.layout.content_shopping_list, parent, false);
+        return new ViewHolder(shoppingListView, itemClickListener);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.productName.setText(listItems.get(position).getProduct().getName());
+        holder.productNameEdit.setText(listItems.get(position).getProduct().getName());
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
+        String priceText = numberFormat.format(listItems.get(position).getPrice());
+        holder.price.setText(priceText);
+        numberFormat = NumberFormat.getNumberInstance();
+        priceText = numberFormat.format(listItems.get(position).getPrice());
+        holder.priceEdit.setText(priceText);
+        holder.quantity.setText(String.format(context.getString(R.string.quantity_string), listItems.get(position).getQuantity()));
+        holder.quantityEdit.setText(String.format("%d", listItems.get(position).getQuantity()));
+    }
+
+    @Override
+    public int getItemCount() {
+        return listItems.size();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
+    }
+
+    public String getItemName(int position) {
+        return listItems.get(position).getProduct().getName();
+    }
+
 
     public interface OnItemClickListener {
         void onDeleteButton(int position);
@@ -39,14 +83,6 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
         void onCancelButton(int position);
 
         void onBuyButton(int position);
-    }
-
-    OnItemClickListener itemClickListener;
-
-    public ShoppingListAdapter(List<ShoppingListItemData> dataSource, Context context, int listType) {
-        this.dataSource = dataSource;
-        this.context = context;
-        this.listType = listType;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
@@ -72,7 +108,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             super(itemView);
             this.itemClickListener = itemClickListener;
             viewFlipper = (ViewFlipper) itemView.findViewById(R.id.view_flipper);
-            productName = (TextView) itemView.findViewById(R.id.product_name);
+            productName = (TextView) itemView.findViewById(R.id.item_name);
             productNameEdit = (AutoCompleteTextView) itemView.findViewById(R.id.product_name_edit);
             price = (TextView) itemView.findViewById(R.id.price);
             priceEdit = (EditText) itemView.findViewById(R.id.price_edit);
@@ -157,53 +193,22 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
         }
 
         private void insertEditedItemData(int position) {
-            ShoppingListItemData item;
-            item = dataSource.get(getAdapterPosition());
-            item.setProductName(productNameEdit.getText().toString());
+            ShoppingListItem item;
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            item = listItems.get(getAdapterPosition());
+            item.getProduct().setName(productNameEdit.getText().toString());
             if (priceEdit.getText().length() > 0) {
                 item.setPrice(Double.parseDouble(priceEdit.getText().toString()));
             } else {
                 item.setPrice(0.0);
             }
             item.setQuantity(Integer.parseInt(quantityEdit.getText().toString()));
-            dataSource.set(position, item);
+            listItems.set(position, item);
+            realm.commitTransaction();
+            realm.close();
             notifyItemChanged(position);
         }
-    }
-
-    @Override
-    public ShoppingListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View shoppingListView = inflater.inflate(R.layout.content_shopping_list, parent, false);
-        return new ViewHolder(shoppingListView, itemClickListener);
-    }
-
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.productName.setText(dataSource.get(position).getProductName());
-        holder.productNameEdit.setText(dataSource.get(position).getProductName());
-        NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
-        String priceText = numberFormat.format(dataSource.get(position).getPrice());
-        holder.price.setText(priceText);
-        holder.priceEdit.setText(dataSource.get(position).getPriceString());
-        holder.quantity.setText(String.format(context.getString(R.string.quantity_string), dataSource.get(position).getQuantity()));
-        holder.quantityEdit.setText(String.format("%d", dataSource.get(position).getQuantity()));
-    }
-
-    @Override
-    public int getItemCount() {
-        return dataSource.size();
-    }
-
-
-    public void setOnItemClickListener(OnItemClickListener itemClickListener) {
-        this.itemClickListener = itemClickListener;
-    }
-
-    public String getItemName(int position) {
-        return dataSource.get(position).getProductName();
     }
 
 }

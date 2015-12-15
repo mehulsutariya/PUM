@@ -3,10 +3,10 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_margin="10dp">
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -14,28 +14,28 @@
             android:orientation="horizontal">
 
             <android.support.design.widget.TextInputLayout
-                android:layout_height="wrap_content"
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="0.80">
 
                 <AutoCompleteTextView
-                    android:id="@+id/product_name"
+                    android:id="@+id/item_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/shopping_list_product"
-                    android:inputType="textAutoComplete"
-                    android:imeOptions="actionDone" />
+                    android:imeOptions="actionDone"
+                    android:inputType="textAutoComplete" />
             </android.support.design.widget.TextInputLayout>
 
             <ImageButton
                 android:id="@+id/delete_item_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.20"
                 android:layout_gravity="center_vertical"
+                android:layout_weight="0.20"
                 android:background="@drawable/image_button_background_grey"
-                android:src="@drawable/ic_delete_black_24dp"
-                android:contentDescription="@string/delete" />
+                android:contentDescription="@string/delete"
+                android:src="@drawable/ic_delete_black_24dp" />
 
         </LinearLayout>
 
@@ -45,8 +45,8 @@
             android:baselineAligned="false">
 
             <android.support.design.widget.TextInputLayout
-                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="0.5">
 
                 <EditText
@@ -54,13 +54,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/shopping_list_price"
-                    android:inputType="numberDecimal"
-                    android:imeOptions="actionDone" />
+                    android:imeOptions="actionDone"
+                    android:inputType="numberDecimal" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="0.5">
 
                 <EditText
@@ -68,8 +68,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/quantity"
-                    android:inputType="numberDecimal"
-                    android:imeOptions="actionDone" />
+                    android:imeOptions="actionDone"
+                    android:inputType="numberDecimal" />
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
@@ -89,11 +89,11 @@
                 android:id="@+id/add_category_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.20"
-                android:src="@drawable/ic_add_black_24dp"
                 android:layout_gravity="center_vertical"
+                android:layout_weight="0.20"
                 android:background="@drawable/image_button_background_grey"
-                android:contentDescription="@string/add_category" />
+                android:contentDescription="@string/add_category"
+                android:src="@drawable/ic_add_black_24dp" />
 
         </LinearLayout>
 

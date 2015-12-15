@@ -8,31 +8,32 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import pl.polsl.pum2.shoppingapp.R;
-import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
 
 public class ShoppingListActivity extends AppCompatActivity implements ShoppingListFragment.OnFragmentInteractionListener {
-
+    public final static String LIST_NAME = "listName";
+    final static int SHOPPING_LIST = 0;
+    final static int CART = 1;
     private FloatingActionButton fab;
     private CoordinatorLayout.LayoutParams fabLayoutParams;
     private CoordinatorLayout.Behavior defaultFABBehavior;
     private CoordinatorLayout.Behavior scrollFABBehavior;
-    private Fragment currentTabFragment;
-    private PagerAdapter pagerAdapter;
-
-    final static int SHOPPING_LIST = 0;
-    final static int CART = 1;
+    private ShoppingListPagerAdapter pagerAdapter;
+    private String listName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
+        listName = getIntent().getStringExtra(LIST_NAME);
+        if (listName == null) {
+            listName = "";
+        }
         setupToolbar();
         setupTabLayout();
         setupFloatingActionButton();
@@ -45,8 +46,8 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new PagerAdapter
-                (getSupportFragmentManager(), tabLayout.getTabCount());
+        pagerAdapter = new ShoppingListPagerAdapter
+                (getSupportFragmentManager(), tabLayout.getTabCount(), listName);
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -101,16 +102,8 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
                         ShoppingListActivity.this, fab, "transition_create_or_edit_list");
                 Intent intent = new Intent(ShoppingListActivity.this, ShoppingListEditorActivity.class);
                 intent.putExtra(ShoppingListEditorActivity.MODE, ShoppingListEditorActivity.ADD_LIST_ITEMS);
+                intent.putExtra(ShoppingListEditorActivity.LIST_NAME, listName);
                 ActivityCompat.startActivity(ShoppingListActivity.this, intent, options.toBundle());
-
-                //TODO: Tymczasowo, później do usunięcia:--------------------------------------------------------
-                ShoppingListItemData data = new ShoppingListItemData("nowy produkt", "Kategoria1", 1.0, 1, false);
-                currentTabFragment = pagerAdapter.getCurrentFragment();
-                if (currentTabFragment instanceof ShoppingListFragment) {
-                    ShoppingListFragment fragment = (ShoppingListFragment) currentTabFragment;
-                    fragment.addNewItem(data);
-                }
-                //------------------------------------------------------------------------------------------------
 
                 Snackbar.make(view, getString(R.string.product_added), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();

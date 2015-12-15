@@ -1,19 +1,20 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
-public class PagerAdapter extends FragmentPagerAdapter {
+public class ShoppingListPagerAdapter extends FragmentPagerAdapter {
     private int numOfTabs;
     private Fragment currentFragment;
+    private String listName;
 
-    public PagerAdapter(FragmentManager fm, int numOfTabs) {
+    public ShoppingListPagerAdapter(FragmentManager fm, int numOfTabs, String listName) {
         super(fm);
         this.numOfTabs = numOfTabs;
+        this.listName = listName;
     }
 
     @Override
@@ -30,10 +31,10 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @NonNull
     private Fragment getFragment(int type) {
-        Bundle arguments = new Bundle();
-        ShoppingListFragment fragment = new ShoppingListFragment();
-        arguments.putInt("ListType", type);
-        fragment.setArguments(arguments);
+        //Bundle arguments = new Bundle();
+        ShoppingListFragment fragment = ShoppingListFragment.newInstance(listName);
+        //arguments.putInt("ListType", type);
+        //fragment.setArguments(arguments);
         return fragment;
     }
 

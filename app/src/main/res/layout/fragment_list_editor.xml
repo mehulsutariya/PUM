@@ -2,15 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".gui.ListEditorFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".gui.ListEditorFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:orientation="vertical"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
@@ -21,8 +21,8 @@
             android:id="@+id/shopping_list_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeOptions="actionDone"
             android:allowUndo="false"
+            android:imeOptions="actionDone"
             android:inputType="text" />
 
 
@@ -30,8 +30,8 @@
             android:id="@+id/market_map_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/market_map"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:text="@string/market_map" />
 
         <Spinner
             android:id="@+id/maret_map_spinner"
@@ -42,25 +42,25 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/editMarketMapButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/edit_map_button"
-                android:background="@drawable/button_background"
-                android:textColor="@android:color/white"
+                android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginEnd="10dp" />
+                android:background="@drawable/button_background"
+                android:text="@string/edit_map_button"
+                android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/newMarketMapButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/new_map_button"
                 android:background="@drawable/button_background"
+                android:text="@string/new_map_button"
                 android:textColor="@android:color/white" />
 
         </LinearLayout>
@@ -69,30 +69,30 @@
     </LinearLayout>
 
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimary"
-        style="?android:attr/buttonBarStyle">
+        android:gravity="center_horizontal">
 
 
         <Button
+            android:id="@+id/add_products_button"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:id="@+id/add_products_button"
             android:text="@string/add_products_button"
-            style="?android:attr/buttonBarButtonStyle"
             android:textColor="@android:color/white" />
 
         <Button
+            android:id="@+id/done_button"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:id="@+id/done_button"
             android:text="@string/done_button_text"
-            style="?android:attr/buttonBarButtonStyle"
             android:textColor="@android:color/white" />
 
     </LinearLayout>

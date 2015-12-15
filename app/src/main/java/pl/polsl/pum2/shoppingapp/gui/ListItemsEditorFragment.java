@@ -3,7 +3,6 @@ package pl.polsl.pum2.shoppingapp.gui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,25 +13,42 @@ import android.widget.Button;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.RealmList;
+import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
-import pl.polsl.pum2.shoppingapp.model.ShoppingListItemData;
+import pl.polsl.pum2.shoppingapp.database.Product;
+import pl.polsl.pum2.shoppingapp.database.ShoppingList;
+import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
-public class ListItemsEditorFragment extends Fragment {
+public class ListItemsEditorFragment extends BaseRealmFragment {
 
+    public static final String LIST_NAME = "listName";
     private static final String LAYOUT_MANAGER_STATE = "layoutManagerState";
-    private List<ShoppingListItemData> listItems;
+    private static final String MESSAGE_DIALOG_TAG = "messageDialogTag";
+    private List<ShoppingListItem> listItems;
+    private ShoppingList shoppingList;
     private ListItemsEditorAdapter listAdapter;
     private RecyclerView recyclerView;
     private Activity activity;
     private View view;
     private LinearLayoutManager recyclerViewLayoutManager;
-    private static final String MESSAGE_DIALOG_TAG = "messageDialogTag";
+
+    public static ListItemsEditorFragment newInstance(String listName) {
+        ListItemsEditorFragment fragment = new ListItemsEditorFragment();
+        Bundle arguments = new Bundle();
+        arguments.putString(LIST_NAME, listName);
+        fragment.setArguments(arguments);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle arguments = getArguments();
+        String listName = arguments.getString(LIST_NAME, "");
+        shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
         listItems = new ArrayList<>();
-        setRetainInstance(true);
+        setRetainInstance(true); //TODO: sprawdzić czy nadal potrzebne
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,7 +73,7 @@ public class ListItemsEditorFragment extends Fragment {
     }
 
     private void insertNewItem() {
-        listItems.add(new ShoppingListItemData());
+        listItems.add(new ShoppingListItem());
         listAdapter.notifyItemInserted(listItems.size() - 1);
         recyclerView.scrollToPosition(listItems.size() - 1);
     }
@@ -75,8 +91,8 @@ public class ListItemsEditorFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 boolean formIsNotCompleted = false;
-                for (ShoppingListItemData item : listItems) {
-                    if (item.isEmpty()) {
+                for (ShoppingListItem item : listItems) {
+                    if (itemIsEmpty(item)) {
                         formIsNotCompleted = true;
                         break;
                     }
@@ -84,12 +100,35 @@ public class ListItemsEditorFragment extends Fragment {
                 if (formIsNotCompleted) {
                     showMessageDialog();
                 } else {
-                    //TODO: wstawienie danych do bazy
+                    saveList();
                     activity.finish();
                 }
             }
         });
 
+    }
+
+    private void saveList() {
+        realm.beginTransaction();
+        RealmList<ShoppingListItem> items = shoppingList.getItems();
+        for (int i = 0; i < listItems.size(); i++) {
+            ShoppingListItem item = listItems.get(i);
+            try {
+                items.add(item);
+            } catch (RealmPrimaryKeyConstraintException e) {
+                String productName = item.getProduct().getName();
+                Product existingProduct = realm.where(Product.class).equalTo("name", productName).findFirst();
+                item.setProduct(existingProduct);
+                items.add(item);
+            }
+        }
+        realm.copyToRealmOrUpdate(shoppingList);
+        realm.commitTransaction();
+    }
+
+    private boolean itemIsEmpty(ShoppingListItem item) {
+        //TODO
+        return false;
     }
 
     private void showMessageDialog() {

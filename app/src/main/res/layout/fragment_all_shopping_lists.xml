@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="pl.polsl.pum2.shoppingapp.gui.AllShoppingListsFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="pl.polsl.pum2.shoppingapp.gui.AllShoppingListsFragment">
 
     <TextView
         android:layout_width="wrap_content"

@@ -10,6 +10,7 @@ import pl.polsl.pum2.shoppingapp.R;
 public class ShoppingListEditorActivity extends AppCompatActivity implements ListEditorFragment.OnFragmentInteractionListener {
 
     public static final String MODE = "pl.polsl.pum2.shoppingapp.gui.mode";
+    public static final String LIST_NAME = "pl.polsl.pum2.shoppingapp.gui.ShoppingListEditorActivity.listName";
 
     final static int CREATE_NEW_LIST = 0;
     final static int ADD_LIST_ITEMS = 1;
@@ -21,6 +22,7 @@ public class ShoppingListEditorActivity extends AppCompatActivity implements Lis
     private FragmentManager fragmentManager;
     private boolean isEditModeDuringListCreation;
     private int mode;
+    private String listName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +47,13 @@ public class ShoppingListEditorActivity extends AppCompatActivity implements Lis
             if (newListFragment == null) {
                 newListFragment = new ListEditorFragment();
             }
-        }
-
-        listItemsEditorFragment = (ListItemsEditorFragment) fragmentManager.findFragmentByTag(NEW_ITEMS_FRAGMENT);
-        if (listItemsEditorFragment == null) {
-            listItemsEditorFragment = new ListItemsEditorFragment();
+            listItemsEditorFragment = (ListItemsEditorFragment) fragmentManager.findFragmentByTag(NEW_ITEMS_FRAGMENT);
+            if (listItemsEditorFragment == null) {
+                listItemsEditorFragment = new ListItemsEditorFragment();
+            }
+        } else {
+            listName = getIntent().getStringExtra(LIST_NAME);
+            listItemsEditorFragment = ListItemsEditorFragment.newInstance(listName);
         }
 
         setCurrentFragment();
@@ -79,6 +83,9 @@ public class ShoppingListEditorActivity extends AppCompatActivity implements Lis
 
     @Override
     public void onEditList() {
+        Bundle arguments = new Bundle();
+        arguments.putString(ListItemsEditorFragment.LIST_NAME, listName);
+        listItemsEditorFragment.setArguments(arguments);
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, listItemsEditorFragment, NEW_ITEMS_FRAGMENT)
                 .addToBackStack(null)
@@ -90,6 +97,10 @@ public class ShoppingListEditorActivity extends AppCompatActivity implements Lis
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(IS_EDIT_MODE_DURING_LIST_CREATION, isEditModeDuringListCreation);
+    }
+
+    public void setListName(String listName) {
+        this.listName = listName;
     }
 
 }
