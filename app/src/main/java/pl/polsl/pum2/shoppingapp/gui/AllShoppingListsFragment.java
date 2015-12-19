@@ -2,43 +2,50 @@ package pl.polsl.pum2.shoppingapp.gui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
+import io.realm.Realm;
 import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
 
-public class AllShoppingListsFragment extends BaseRealmFragment {
+public class AllShoppingListsFragment extends Fragment {
 
     private RealmResults<ShoppingList> shoppingLists;
     private RealmRecyclerView shoppingListsRecyclerView;
     private AllShoppingListsAdapter adapter;
+    private Realm realm;
 
     public AllShoppingListsFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        shoppingLists = realm.where(ShoppingList.class).findAll();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main_activity_list, container, false);
-        setupRecyclerView(view);
+        shoppingListsRecyclerView = (RealmRecyclerView) view.findViewById(R.id.recycler_view);
         return view;
     }
 
-    private void setupRecyclerView(View view) {
-        shoppingListsRecyclerView = (RealmRecyclerView) view.findViewById(R.id.recycler_view);
+    @Override
+    public void onStart() {
+        super.onStart();
+        realm = Realm.getDefaultInstance();
+        shoppingLists = realm.where(ShoppingList.class).findAll();
         setRecyclerViewAdapter();
+
     }
+
+    public void onStop() {
+        super.onStop();
+        realm.close();
+    }
+
 
     private void setRecyclerViewAdapter() {
         adapter = new AllShoppingListsAdapter(getContext(), shoppingLists, true, true);

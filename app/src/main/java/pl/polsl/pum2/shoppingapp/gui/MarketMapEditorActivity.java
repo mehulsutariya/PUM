@@ -35,10 +35,7 @@ public class MarketMapEditorActivity extends AppCompatActivity {
     }
 
     private void showDialog() {
-        Bundle message = new Bundle();
-        message.putString(MessageDialogFragment.MESSAGE, getString(R.string.map_form_message));
-        MessageDialogFragment dialogFragment = new MessageDialogFragment();
-        dialogFragment.setArguments(message);
+        MessageDialogFragment dialogFragment = MessageDialogFragment.newInstance(getString(R.string.map_form_message));
         dialogFragment.show(getSupportFragmentManager(), MAP_EDITOR_DIALOG_TAG);
     }
 

@@ -15,6 +15,14 @@ public class DeleteItemDialogFragment extends DialogFragment {
 
     public static final String PRODUCT_NAME = "ProductName";
 
+    public static DeleteItemDialogFragment newInstance(String productName) {
+        DeleteItemDialogFragment dialogFragment = new DeleteItemDialogFragment();
+        Bundle arguments = new Bundle();
+        arguments.putString(PRODUCT_NAME, productName);
+        dialogFragment.setArguments(arguments);
+        return dialogFragment;
+    }
+
     @Override
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {

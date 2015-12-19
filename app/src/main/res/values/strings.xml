@@ -10,7 +10,10 @@
     <string name="sum">Suma:</string>
     <string name="empty_list">Lista zakupów jest pusta</string>
     <string name="product_added">Dodano nowy produkt</string>
+    <string name="product_bought">Produkt przeniesiono do koszyka</string>
+    <string name="product_restored_to_list">Produkt przeniesiono na listę zakupów</string>
     <string name="category">Kategoria</string>
+    <string name="no_price">Brak ceny</string>
 
     <!-- Dodawanie produktów do listy -->
     <string name="title_activity_add_new_item">Dodawanie nowych produktów</string>
@@ -51,4 +54,7 @@
     <string name="clear_button_content_description">Wyczyść</string>
     <string name="new_items_fragment_message">Wprowadź wymagane dane:\n\t&#8226; nazwę produktu,\n\t&#8226; ilość,\n\t&#8226; kategorię.</string>
     <string name="quantity_string">x%1s</string>
+    <string name="listAlreadyExistsMessage">Lista o podanej nazwie już istnieje.</string>
+    <string name="valuesInvalid">Wprowadzone wartości są nieprawidłowe.</string>
+    <string name="noProducts">Brak produktów</string>
 </resources>

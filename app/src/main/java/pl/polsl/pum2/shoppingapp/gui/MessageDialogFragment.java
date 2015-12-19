@@ -14,6 +14,14 @@ public class MessageDialogFragment extends DialogFragment {
 
     public static final String MESSAGE = "Message";
 
+    public static MessageDialogFragment newInstance(String message) {
+        MessageDialogFragment dialogFragment = new MessageDialogFragment();
+        Bundle arguments = new Bundle();
+        arguments.putString(MESSAGE, message);
+        dialogFragment.setArguments(arguments);
+        return dialogFragment;
+    }
+
     @Override
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {

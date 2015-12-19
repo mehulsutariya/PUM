@@ -6,12 +6,14 @@
     android:layout_height="match_parent"
     tools:context="pl.polsl.pum2.shoppingapp.gui.ShoppingListFragment">
 
-    <android.support.v7.widget.RecyclerView
+    <co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView
         android:id="@+id/shopping_list_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="10dp"
         android:scrollbars="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:rrvEmptyLayoutId="@layout/shopping_list_empty_layout"
+        app:rrvLayoutType="LinearLayout" />
 
 </android.support.design.widget.CoordinatorLayout>

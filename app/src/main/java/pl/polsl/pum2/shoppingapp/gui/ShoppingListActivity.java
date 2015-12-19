@@ -1,5 +1,6 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -12,19 +13,24 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 
 import pl.polsl.pum2.shoppingapp.R;
 
 public class ShoppingListActivity extends AppCompatActivity implements ShoppingListFragment.OnFragmentInteractionListener {
     public final static String LIST_NAME = "listName";
-    final static int SHOPPING_LIST = 0;
-    final static int CART = 1;
+    private final static String EDIT_MODE_STATE = "editMode";
+    private final static int EDITOR_ACTIVITY_REQUEST_CODE = 1;
     private FloatingActionButton fab;
+    private TextView boughtProductsPriceSum;
     private CoordinatorLayout.LayoutParams fabLayoutParams;
     private CoordinatorLayout.Behavior defaultFABBehavior;
     private CoordinatorLayout.Behavior scrollFABBehavior;
-    private ShoppingListPagerAdapter pagerAdapter;
     private String listName;
+    private boolean editModeOn;
+    private int currentListType;
+    private boolean snackbarIsVisible;
+    private SnackbarCallback snackbarCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +40,17 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
         if (listName == null) {
             listName = "";
         }
+        boughtProductsPriceSum = (TextView) findViewById(R.id.price_sum);
         setupToolbar();
         setupTabLayout();
         setupFloatingActionButton();
+        if (savedInstanceState != null) {
+            editModeOn = savedInstanceState.getBoolean(EDIT_MODE_STATE);
+        } else {
+            editModeOn = false;
+        }
+        snackbarIsVisible = false;
+        snackbarCallback = new SnackbarCallback();
     }
 
     private void setupTabLayout() {
@@ -46,7 +60,7 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new ShoppingListPagerAdapter
+        ShoppingListPagerAdapter pagerAdapter = new ShoppingListPagerAdapter
                 (getSupportFragmentManager(), tabLayout.getTabCount(), listName);
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -54,9 +68,15 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
             @Override
             public void onPageSelected(int position) {
                 if (position == 0) {
-                    showFloatingActionButton();
+                    currentListType = ShoppingListFragment.SHOPPING_LIST;
+                    if (!editModeOn) {
+                        showFloatingActionButton();
+                    }
+                    fabLayoutParams.setBehavior(scrollFABBehavior);
                 } else {
+                    currentListType = ShoppingListFragment.CART;
                     fab.hide();
+                    fabLayoutParams.setBehavior(defaultFABBehavior);
                 }
             }
         });
@@ -79,11 +99,15 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     }
 
     private void showFloatingActionButton() {
-        fab.show();
-        //korekta pozycji,
-        //bez tego floating action button pojawia się w złym miejscu,
-        // gdy został ukryty przy widocznym snackbarze
-        fab.setTranslationY(0.0f);
+        if (currentListType == ShoppingListFragment.SHOPPING_LIST) {
+            fab.show();
+            //korekta pozycji,
+            //bez tego floating action button pojawia się w złym miejscu,
+            // gdy został ukryty przy widocznym snackbarze
+            if (!snackbarIsVisible) {
+                fab.setTranslationY(0.0f);
+            }
+        }
     }
 
 
@@ -103,10 +127,7 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
                 Intent intent = new Intent(ShoppingListActivity.this, ShoppingListEditorActivity.class);
                 intent.putExtra(ShoppingListEditorActivity.MODE, ShoppingListEditorActivity.ADD_LIST_ITEMS);
                 intent.putExtra(ShoppingListEditorActivity.LIST_NAME, listName);
-                ActivityCompat.startActivity(ShoppingListActivity.this, intent, options.toBundle());
-
-                Snackbar.make(view, getString(R.string.product_added), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                ActivityCompat.startActivityForResult(ShoppingListActivity.this, intent, EDITOR_ACTIVITY_REQUEST_CODE, options.toBundle());
             }
         });
         setFABLayoutParams();
@@ -120,21 +141,36 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDITOR_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Snackbar.make(fab, getString(R.string.product_added), Snackbar.LENGTH_LONG).setCallback(snackbarCallback).show();
+            }
+        }
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //TODO zapisywanie stanu aktywnośći
+        outState.putBoolean(EDIT_MODE_STATE, editModeOn);
     }
 
     @Override
     public void onEnterEditMode() {
-        fab.hide();
-        fabLayoutParams.setBehavior(defaultFABBehavior);
+        if (currentListType == ShoppingListFragment.SHOPPING_LIST) {
+            fab.hide();
+            fabLayoutParams.setBehavior(defaultFABBehavior);
+            editModeOn = true;
+        }
     }
 
     @Override
     public void onExitEditMode() {
-        showFloatingActionButton();
-        fabLayoutParams.setBehavior(scrollFABBehavior);
+        if (currentListType == ShoppingListFragment.SHOPPING_LIST) {
+            showFloatingActionButton();
+            fabLayoutParams.setBehavior(scrollFABBehavior);
+            editModeOn = false;
+        }
     }
 
     @Override
@@ -145,6 +181,33 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     @Override
     public void onItemRemovingCanceled() {
         showFloatingActionButton();
+    }
+
+    @Override
+    public void onItemBought() {
+        Snackbar.make(fab, getString(R.string.product_bought), Snackbar.LENGTH_LONG).setCallback(snackbarCallback).show();
+    }
+
+    @Override
+    public void onItemRestoredToList() {
+        Snackbar.make(fab, getString(R.string.product_restored_to_list), Snackbar.LENGTH_LONG).setCallback(snackbarCallback).show();
+    }
+
+    @Override
+    public void onBoughtItemsPriceSumChanged(String priceSum) {
+        boughtProductsPriceSum.setText(priceSum);
+    }
+
+    private class SnackbarCallback extends Snackbar.Callback {
+        @Override
+        public void onDismissed(Snackbar snackbar, int event) {
+            snackbarIsVisible = false;
+        }
+
+        @Override
+        public void onShown(Snackbar snackbar) {
+            snackbarIsVisible = true;
+        }
     }
 
 }

@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -61,7 +62,7 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        EditText productName;
+        AutoCompleteTextView productName;
         Spinner productCategory;
         EditText price;
         EditText quantity;
@@ -69,7 +70,7 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
 
         public ViewHolder(View itemView) {
             super(itemView);
-            productName = (EditText) itemView.findViewById(R.id.item_name);
+            productName = (AutoCompleteTextView) itemView.findViewById(R.id.item_name);
             productCategory = (Spinner) itemView.findViewById(R.id.product_category);
             price = (EditText) itemView.findViewById(R.id.price);
             quantity = (EditText) itemView.findViewById(R.id.quantity);

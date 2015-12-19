@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 public class ShoppingListPagerAdapter extends FragmentPagerAdapter {
     private int numOfTabs;
-    private Fragment currentFragment;
     private String listName;
 
     public ShoppingListPagerAdapter(FragmentManager fm, int numOfTabs, String listName) {
@@ -21,9 +20,9 @@ public class ShoppingListPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return getFragment(ShoppingListActivity.SHOPPING_LIST);
+                return getFragment(ShoppingListFragment.SHOPPING_LIST);
             case 1:
-                return getFragment(ShoppingListActivity.CART);
+                return getFragment(ShoppingListFragment.CART);
             default:
                 return null;
         }
@@ -31,17 +30,13 @@ public class ShoppingListPagerAdapter extends FragmentPagerAdapter {
 
     @NonNull
     private Fragment getFragment(int type) {
-        //Bundle arguments = new Bundle();
-        ShoppingListFragment fragment = ShoppingListFragment.newInstance(listName);
-        //arguments.putInt("ListType", type);
-        //fragment.setArguments(arguments);
+        ShoppingListFragment fragment = ShoppingListFragment.newInstance(listName, type);
         return fragment;
     }
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
         super.setPrimaryItem(container, position, object);
-        currentFragment = (Fragment) object;
     }
 
     @Override
@@ -49,7 +44,4 @@ public class ShoppingListPagerAdapter extends FragmentPagerAdapter {
         return numOfTabs;
     }
 
-    public Fragment getCurrentFragment() {
-        return currentFragment;
-    }
 }

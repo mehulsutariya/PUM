@@ -14,7 +14,7 @@ import pl.polsl.pum2.shoppingapp.database.Product;
 
 public class ProductsAdapter extends RealmBasedRecyclerViewAdapter<Product, ProductsAdapter.ViewHolder> {
 
-    ProductsAdapter(Context context, RealmResults<Product> realmResults, boolean automaticUpdate, boolean animateIdType) {
+    public ProductsAdapter(Context context, RealmResults<Product> realmResults, boolean automaticUpdate, boolean animateIdType) {
         super(context, realmResults, automaticUpdate, animateIdType);
     }
 

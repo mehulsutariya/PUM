@@ -3,6 +3,7 @@ package pl.polsl.pum2.shoppingapp.gui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +16,12 @@ import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
 
 
-public class ListEditorFragment extends BaseRealmFragment {
+public class ListEditorFragment extends Fragment {
 
     private static final String MESSAGE_DIALOG_TAG = "pl.polsl.pum2.shoppingapp.gui.ListEditorFragment.messageDialogTag";
     OnFragmentInteractionListener listener;
     private EditText listName;
+    private Realm realm;
 
     public ListEditorFragment() {
         // Required empty public constructor
@@ -54,10 +56,14 @@ public class ListEditorFragment extends BaseRealmFragment {
             @Override
             public void onClick(View v) {
                 if (formIsCompleted()) {
-                    saveList();
-                    getActivity().finish();
+                    try {
+                        saveList();
+                        getActivity().finish();
+                    } catch (RealmPrimaryKeyConstraintException e) {
+                        showExistingListMessageDialog();
+                    }
                 } else {
-                    showMessageDialog();
+                    showIncompleteFormMessageDialog();
                 }
             }
         });
@@ -66,31 +72,47 @@ public class ListEditorFragment extends BaseRealmFragment {
             @Override
             public void onClick(View v) {
                 if (formIsCompleted()) {
-                    saveList();
-                    ShoppingListEditorActivity activity = (ShoppingListEditorActivity) getActivity();
-                    activity.setListName(listName.getText().toString());
-                    listener.onEditList();
+                    try {
+                        saveList();
+                        ShoppingListEditorActivity activity = (ShoppingListEditorActivity) getActivity();
+                        activity.setListName(listName.getText().toString());
+                        listener.onEditList();
+                    } catch (RealmPrimaryKeyConstraintException e) {
+                        showExistingListMessageDialog();
+                    }
                 } else {
-                    showMessageDialog();
+                    showIncompleteFormMessageDialog();
                 }
             }
         });
         return view;
     }
 
-    private void saveList() {
-        try {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    ShoppingList list = realm.createObject(ShoppingList.class);
-                    list.setName(listName.getText().toString());
-                }
-            });
-        } catch (RealmPrimaryKeyConstraintException e) {
-            //TODO
-        }
+    @Override
+    public void onStart() {
+        super.onStart();
+        realm = Realm.getDefaultInstance();
+    }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        realm.close();
+    }
+
+    private void saveList() throws RealmPrimaryKeyConstraintException {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                ShoppingList list = realm.createObject(ShoppingList.class);
+                list.setName(listName.getText().toString().trim());
+            }
+        });
+    }
+
+    private void showExistingListMessageDialog() {
+        MessageDialogFragment dialogFragment = MessageDialogFragment.newInstance(getString(R.string.listAlreadyExistsMessage));
+        dialogFragment.show(getFragmentManager(), "listExistsMessage");
     }
 
     private void createOrEditMarketMap() {
@@ -98,11 +120,8 @@ public class ListEditorFragment extends BaseRealmFragment {
         getActivity().startActivity(intent);
     }
 
-    private void showMessageDialog() {
-        MessageDialogFragment messageDialogFragment = new MessageDialogFragment();
-        Bundle message = new Bundle();
-        message.putString(MessageDialogFragment.MESSAGE, getString(R.string.new_list_form_message));
-        messageDialogFragment.setArguments(message);
+    private void showIncompleteFormMessageDialog() {
+        MessageDialogFragment messageDialogFragment = MessageDialogFragment.newInstance(getString(R.string.new_list_form_message));
         messageDialogFragment.show(getActivity().getSupportFragmentManager(), MESSAGE_DIALOG_TAG);
     }
 

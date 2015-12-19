@@ -1,7 +1,7 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,26 +19,31 @@ import android.widget.ViewFlipper;
 import java.text.NumberFormat;
 
 import io.realm.Realm;
-import io.realm.RealmList;
+import io.realm.RealmBasedRecyclerViewAdapter;
+import io.realm.RealmResults;
+import io.realm.RealmViewHolder;
+import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
+import pl.polsl.pum2.shoppingapp.database.Product;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
 
-class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewHolder> {
+class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem, ShoppingListAdapter.ViewHolder> {
 
+    public static int EDIT_SUCCEEDED = 0;
+    public static int EDIT_FAILED = 1;
     OnItemClickListener itemClickListener;
-    private RealmList<ShoppingListItem> listItems;
     private Context context;
     private int listType;
 
-    public ShoppingListAdapter(RealmList<ShoppingListItem> listItems, Context context, int listType) {
-        this.listItems = listItems;
+    public ShoppingListAdapter(Context context, RealmResults<ShoppingListItem> realmResults, boolean automaticUpdate, boolean animateIdType, int listType) {
+        super(context, realmResults, automaticUpdate, animateIdType);
         this.context = context;
         this.listType = listType;
     }
 
     @Override
-    public ShoppingListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ShoppingListAdapter.ViewHolder onCreateRealmViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View shoppingListView = inflater.inflate(R.layout.content_shopping_list, parent, false);
@@ -46,22 +51,28 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.productName.setText(listItems.get(position).getProduct().getName());
-        holder.productNameEdit.setText(listItems.get(position).getProduct().getName());
-        NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
-        String priceText = numberFormat.format(listItems.get(position).getPrice());
+    public void onBindRealmViewHolder(ViewHolder holder, int position) {
+        holder.productName.setText(realmResults.get(position).getProduct().getName());
+        holder.productNameEdit.setText(realmResults.get(position).getProduct().getName());
+        Double price = realmResults.get(position).getPrice();
+        String priceText;
+        NumberFormat numberFormat;
+        if (price > 0) {
+            numberFormat = NumberFormat.getCurrencyInstance();
+            priceText = numberFormat.format(realmResults.get(position).getPrice());
+        } else {
+            priceText = context.getString(R.string.no_price);
+        }
         holder.price.setText(priceText);
-        numberFormat = NumberFormat.getNumberInstance();
-        priceText = numberFormat.format(listItems.get(position).getPrice());
+        if (price > 0) {
+            numberFormat = NumberFormat.getNumberInstance();
+            priceText = numberFormat.format(realmResults.get(position).getPrice());
+        } else {
+            priceText = "";
+        }
         holder.priceEdit.setText(priceText);
-        holder.quantity.setText(String.format(context.getString(R.string.quantity_string), listItems.get(position).getQuantity()));
-        holder.quantityEdit.setText(String.format("%d", listItems.get(position).getQuantity()));
-    }
-
-    @Override
-    public int getItemCount() {
-        return listItems.size();
+        holder.quantity.setText(String.format(context.getString(R.string.quantity_string), realmResults.get(position).getQuantity()));
+        holder.quantityEdit.setText(String.format("%d", realmResults.get(position).getQuantity()));
     }
 
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
@@ -69,7 +80,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
     }
 
     public String getItemName(int position) {
-        return listItems.get(position).getProduct().getName();
+        return realmResults.get(position).getProduct().getName();
     }
 
 
@@ -78,14 +89,14 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
 
         void onEditButton(int position);
 
-        void onDoneButton(int position);
+        void onDoneButton(int position, int editResult);
 
         void onCancelButton(int position);
 
-        void onBuyButton(int position);
+        void onBuyButton(int position, int listType);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+    public class ViewHolder extends RealmViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
         ViewFlipper viewFlipper;
         AutoCompleteTextView productNameEdit;
@@ -133,8 +144,8 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             clearQuantityButton.setOnClickListener(this);
             cancelButton.setOnClickListener(this);
             buyButton.setOnClickListener(this);
-            if (listType == ShoppingListActivity.CART) {
-                buyButton.setVisibility(View.GONE);
+            if (listType == ShoppingListFragment.CART) {
+                buyButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_list_white_24dp));
             }
         }
 
@@ -147,13 +158,18 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
                     showPopupMenu(v);
                     break;
                 case R.id.done_button:
-                    itemClickListener.onDoneButton(position);
-                    viewFlipper.showPrevious();
-                    insertEditedItemData(position);
+                    try {
+                        insertEditedItemData(position);
+                        viewFlipper.showPrevious();
+                        itemClickListener.onDoneButton(position, EDIT_SUCCEEDED);
+                    } catch (InvalidItemValuesException e) {
+                        itemClickListener.onDoneButton(position, EDIT_FAILED);
+                    }
                     break;
                 case R.id.cancel_button:
                     itemClickListener.onCancelButton(position);
                     viewFlipper.showPrevious();
+                    cancelEditChanges(position);
                     break;
                 case R.id.clear_product_name:
                     productNameEdit.setText("");
@@ -165,7 +181,7 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
                     quantityEdit.setText("");
                     break;
                 case R.id.buy:
-                    itemClickListener.onBuyButton(position);
+                    itemClickListener.onBuyButton(position, listType);
                     break;
             }
         }
@@ -192,23 +208,59 @@ class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewH
             return false;
         }
 
-        private void insertEditedItemData(int position) {
-            ShoppingListItem item;
-            Realm realm = Realm.getDefaultInstance();
-            realm.beginTransaction();
-            item = listItems.get(getAdapterPosition());
-            item.getProduct().setName(productNameEdit.getText().toString());
-            if (priceEdit.getText().length() > 0) {
-                item.setPrice(Double.parseDouble(priceEdit.getText().toString()));
+        private void insertEditedItemData(int position) throws InvalidItemValuesException {
+            if (editedValuesAreValid()) {
+                ShoppingListItem item = realmResults.get(getAdapterPosition());
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                Product newProductInRealm = null;
+                try {
+                    Product newProduct = new Product();
+                    newProduct.setName(productNameEdit.getText().toString().trim());
+                    newProductInRealm = realm.copyToRealm(newProduct);
+                    realm.commitTransaction();
+                } catch (RealmPrimaryKeyConstraintException e) {
+                    realm.cancelTransaction();
+                }
+                realm.beginTransaction();
+
+                if (newProductInRealm != null) {
+                    item.setProduct(newProductInRealm);
+                } else {
+                    Product existingProduct = realm.where(Product.class).equalTo("name", productNameEdit.getText().toString().trim()).findFirst();
+                    item.setProduct(existingProduct);
+                }
+                if (priceEdit.getText().toString().trim().length() > 0) {
+                    item.setPrice(Double.parseDouble(priceEdit.getText().toString().trim()));
+                } else {
+                    item.setPrice(0.0);
+                }
+                item.setQuantity(Integer.parseInt(quantityEdit.getText().toString().trim()));
+                realm.commitTransaction();
+                realm.close();
+                notifyItemChanged(position);
             } else {
-                item.setPrice(0.0);
+                throw new InvalidItemValuesException();
             }
-            item.setQuantity(Integer.parseInt(quantityEdit.getText().toString()));
-            listItems.set(position, item);
-            realm.commitTransaction();
-            realm.close();
-            notifyItemChanged(position);
         }
+
+        private void cancelEditChanges(int position) {
+            ShoppingListItem item = realmResults.get(position);
+            NumberFormat numberFormat = NumberFormat.getNumberInstance();
+            productNameEdit.setText(item.getProduct().getName());
+            priceEdit.setText(numberFormat.format(item.getPrice()));
+            quantityEdit.setText(numberFormat.format(item.getQuantity()));
+        }
+
+        private boolean editedValuesAreValid() {
+            String productName = productNameEdit.getText().toString().trim();
+            String quantity = quantityEdit.getText().toString().trim();
+            return (productName.length() != 0 && quantity.length() != 0);
+        }
+
+    }
+
+    private class InvalidItemValuesException extends Exception {
     }
 
 }

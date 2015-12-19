@@ -4,42 +4,50 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
-import io.realm.RealmChangeListener;
+import java.text.NumberFormat;
+
+import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
+import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
-public class ShoppingListFragment extends BaseRealmFragment {
+public class ShoppingListFragment extends Fragment {
 
+    public final static int SHOPPING_LIST = 0;
+    public final static int CART = 1;
     private static final String LIST_NAME = "listName";
+    private static final String LIST_TYPE = "listType";
+    private String listName;
     private OnFragmentInteractionListener listener;
-    private RecyclerView shoppingListRecyclerView;
+    private RealmRecyclerView shoppingListRecyclerView;
     private ShoppingListAdapter shoppingListAdapter;
     private ShoppingList shoppingList;
     private int positionOfItemToDelete;
     private int numberOfPositionsInEditMode;
     private Activity activity;
     private int listType;
-    private String listName;
-    private RealmList<ShoppingListItem> listItems;
-    private RealmChangeListener realmChangeListener;
+    private Realm realm;
+
+    private RealmResults<ShoppingListItem> listItems;
 
     public ShoppingListFragment() {
         // Required empty public constructor
     }
 
-    public static ShoppingListFragment newInstance(String listName) {
+    public static ShoppingListFragment newInstance(String listName, int listType) {
         ShoppingListFragment fragment = new ShoppingListFragment();
         Bundle arguments = new Bundle();
         arguments.putString(LIST_NAME, listName);
+        arguments.putInt(LIST_TYPE, listType);
         fragment.setArguments(arguments);
         return fragment;
     }
@@ -60,23 +68,38 @@ public class ShoppingListFragment extends BaseRealmFragment {
         super.onCreate(savedInstanceState);
         activity = getActivity();
         listName = getArguments().getString(LIST_NAME);
-        shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
-        listItems = shoppingList.getItems();
-        listType = getArguments().getInt("ListType");
-        realmChangeListener = new RealmChangeListener() {
-            @Override
-            public void onChange() {
-                shoppingListAdapter.notifyDataSetChanged();
-            }
-        };
-        shoppingList.addChangeListener(realmChangeListener);
+        listType = getArguments().getInt(LIST_TYPE);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shopping_list, container, false);
-        setRecyclerView(view);
+        shoppingListRecyclerView = (RealmRecyclerView) view.findViewById(R.id.shopping_list_recycler_view);
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        realm = Realm.getDefaultInstance();
+        if (shoppingList == null) {
+            shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
+
+            if (listType == SHOPPING_LIST) {
+                listItems = shoppingList.getItems().where().equalTo("isBought", false).findAll();
+            } else {
+                listItems = shoppingList.getItems().where().equalTo("isBought", true).findAll();
+            }
+            setRecyclerViewAdapter();
+            updatePriceSum();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        realm.close();
     }
 
     @Override
@@ -85,28 +108,14 @@ public class ShoppingListFragment extends BaseRealmFragment {
         listener = null;
     }
 
-    private void setRecyclerView(View view) {
-        shoppingListRecyclerView = (RecyclerView) view.findViewById(R.id.shopping_list_recycler_view);
-        shoppingListRecyclerView.setHasFixedSize(true);
-
-        RecyclerView.LayoutManager shoppingListLayoutManager;
-        shoppingListLayoutManager = new LinearLayoutManager(getActivity());
-        shoppingListRecyclerView.setLayoutManager(shoppingListLayoutManager);
-
-        setRecyclerViewAdapter();
-    }
-
     private void setRecyclerViewAdapter() {
-        shoppingListAdapter = new ShoppingListAdapter(listItems, getContext(), listType);
+        shoppingListAdapter = new ShoppingListAdapter(getContext(), listItems, true, false, listType);
         shoppingListAdapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
 
             @Override
             public void onDeleteButton(int position) {
-                DialogFragment deleteItemDialogFragment = new DeleteItemDialogFragment();
+                DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(shoppingListAdapter.getItemName(position));
                 deleteItemDialogFragment.setTargetFragment(ShoppingListFragment.this, 1);
-                Bundle arguments = new Bundle();
-                arguments.putString("ProductName", shoppingListAdapter.getItemName(position));
-                deleteItemDialogFragment.setArguments(arguments);
                 deleteItemDialogFragment.show(getActivity().getSupportFragmentManager(), "deleteItemDialogTag");
                 positionOfItemToDelete = position;
             }
@@ -117,8 +126,14 @@ public class ShoppingListFragment extends BaseRealmFragment {
             }
 
             @Override
-            public void onDoneButton(int position) {
-                exitEditMode();
+            public void onDoneButton(int position, int editResult) {
+                if (editResult == ShoppingListAdapter.EDIT_SUCCEEDED) {
+                    exitEditMode();
+                    updatePriceSum();
+                } else {
+                    MessageDialogFragment dialogFragment = MessageDialogFragment.newInstance(getString(R.string.valuesInvalid));
+                    dialogFragment.show(getFragmentManager(), "itemErrorEditDialog");
+                }
             }
 
             @Override
@@ -127,9 +142,21 @@ public class ShoppingListFragment extends BaseRealmFragment {
             }
 
             @Override
-            public void onBuyButton(int position) {
-                //TODO:
-
+            public void onBuyButton(final int position, final int listType) {
+                realm.beginTransaction();
+                ShoppingListItem item = listItems.get(position);
+                if (listType == SHOPPING_LIST) {
+                    item.setBought(true);
+                } else {
+                    item.setBought(false);
+                }
+                if (listType == SHOPPING_LIST) {
+                    listener.onItemBought();
+                } else {
+                    listener.onItemRestoredToList();
+                }
+                realm.commitTransaction();
+                updatePriceSum();
             }
         });
         shoppingListRecyclerView.setAdapter(shoppingListAdapter);
@@ -153,7 +180,7 @@ public class ShoppingListFragment extends BaseRealmFragment {
     private void hideSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        if (imm.isAcceptingText()) { // verify if the soft keyboard is open
+        if (imm.isActive()) {
             imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
         }
     }
@@ -163,14 +190,27 @@ public class ShoppingListFragment extends BaseRealmFragment {
         RealmList<ShoppingListItem> listItems = shoppingList.getItems();
         ShoppingListItem itemToDelete = listItems.get(positionOfItemToDelete);
         itemToDelete.removeFromRealm();
-        listItems.clear();
         realm.commitTransaction();
         shoppingListAdapter.notifyItemRemoved(positionOfItemToDelete);
         listener.onItemRemoved();
+        updatePriceSum();
     }
 
     void cancelItemRemoving() {
         listener.onItemRemovingCanceled();
+    }
+
+    private void updatePriceSum() {
+
+        RealmResults<ShoppingListItem> itemsWithPrice = shoppingList.getItems().where().greaterThan("price", 0.0).equalTo("isBought", true).findAll();
+        double priceSum = 0;
+        for (ShoppingListItem item : itemsWithPrice) {
+            priceSum += item.getPrice() * item.getQuantity();
+        }
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
+        String priceSumStr = numberFormat.format(priceSum);
+        listener.onBoughtItemsPriceSumChanged(priceSumStr);
+
     }
 
     public interface OnFragmentInteractionListener {
@@ -181,6 +221,32 @@ public class ShoppingListFragment extends BaseRealmFragment {
         void onItemRemoved();
 
         void onItemRemovingCanceled();
+
+        void onItemBought();
+
+        void onItemRestoredToList();
+
+        void onBoughtItemsPriceSumChanged(String priceSum);
     }
 
+    /*
+    private class PriceSumCounter extends AsyncTask<ShoppingList, Void, Double> {
+        protected Double doInBackground(ShoppingList... shoppingLists) {
+            shoppingList = shoppingLists[0];
+            RealmResults<ShoppingListItem> itemsWithPrice = shoppingList.getItems().where().greaterThan("price", 0.0).equalTo("isBought", true).findAll();
+            double priceSum = 0;
+            for (ShoppingListItem item : itemsWithPrice) {
+                priceSum += item.getPrice() * item.getQuantity();
+            }
+            return priceSum;
+        }
+
+        protected void onPostExecute(Double result) {
+            NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
+            String priceSumStr = numberFormat.format(result);
+            listener.onBoughtItemsPriceSumChanged(priceSumStr);
+        }
+
+    }
+    */
 }

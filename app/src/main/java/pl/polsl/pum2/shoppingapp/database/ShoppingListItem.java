@@ -10,6 +10,12 @@ public class ShoppingListItem extends RealmObject {
     private double price;
     private boolean isBought;
 
+    public ShoppingListItem() {
+        quantity = 1;
+        price = 0;
+        isBought = false;
+    }
+
     public Product getProduct() {
         return product;
     }
