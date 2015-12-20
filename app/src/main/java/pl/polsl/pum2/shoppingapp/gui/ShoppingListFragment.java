@@ -2,6 +2,7 @@ package pl.polsl.pum2.shoppingapp.gui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -83,7 +84,6 @@ public class ShoppingListFragment extends Fragment {
     public void onStart() {
         super.onStart();
         realm = Realm.getDefaultInstance();
-        if (shoppingList == null) {
             shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
 
             if (listType == SHOPPING_LIST) {
@@ -91,9 +91,9 @@ public class ShoppingListFragment extends Fragment {
             } else {
                 listItems = shoppingList.getItems().where().equalTo("isBought", true).findAll();
             }
-            setRecyclerViewAdapter();
             updatePriceSum();
-        }
+
+        setRecyclerViewAdapter();
     }
 
     @Override
@@ -201,16 +201,7 @@ public class ShoppingListFragment extends Fragment {
     }
 
     private void updatePriceSum() {
-
-        RealmResults<ShoppingListItem> itemsWithPrice = shoppingList.getItems().where().greaterThan("price", 0.0).equalTo("isBought", true).findAll();
-        double priceSum = 0;
-        for (ShoppingListItem item : itemsWithPrice) {
-            priceSum += item.getPrice() * item.getQuantity();
-        }
-        NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
-        String priceSumStr = numberFormat.format(priceSum);
-        listener.onBoughtItemsPriceSumChanged(priceSumStr);
-
+        new PricesSumCounter().execute();
     }
 
     public interface OnFragmentInteractionListener {
@@ -229,15 +220,17 @@ public class ShoppingListFragment extends Fragment {
         void onBoughtItemsPriceSumChanged(String priceSum);
     }
 
-    /*
-    private class PriceSumCounter extends AsyncTask<ShoppingList, Void, Double> {
-        protected Double doInBackground(ShoppingList... shoppingLists) {
-            shoppingList = shoppingLists[0];
+
+    private class PricesSumCounter extends AsyncTask<Void, Void, Double> {
+        protected Double doInBackground(Void... params) {
+            Realm realm = Realm.getDefaultInstance();
+            ShoppingList shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
             RealmResults<ShoppingListItem> itemsWithPrice = shoppingList.getItems().where().greaterThan("price", 0.0).equalTo("isBought", true).findAll();
             double priceSum = 0;
             for (ShoppingListItem item : itemsWithPrice) {
                 priceSum += item.getPrice() * item.getQuantity();
             }
+            realm.close();
             return priceSum;
         }
 
@@ -248,5 +241,5 @@ public class ShoppingListFragment extends Fragment {
         }
 
     }
-    */
+
 }

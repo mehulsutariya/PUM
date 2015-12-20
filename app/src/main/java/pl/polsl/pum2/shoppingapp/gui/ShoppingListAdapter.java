@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmBasedRecyclerViewAdapter;
@@ -230,8 +232,19 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
                     Product existingProduct = realm.where(Product.class).equalTo("name", productNameEdit.getText().toString().trim()).findFirst();
                     item.setProduct(existingProduct);
                 }
-                if (priceEdit.getText().toString().trim().length() > 0) {
-                    item.setPrice(Double.parseDouble(priceEdit.getText().toString().trim()));
+                NumberFormat numberFormat = NumberFormat.getNumberInstance();
+                String priceString = priceEdit.getText().toString();
+                if (priceString.length() > 0) {
+                    try {
+                        item.setPrice(numberFormat.parse(priceString).doubleValue());
+                    } catch (ParseException e) {
+                        numberFormat = NumberFormat.getNumberInstance(Locale.US);
+                        try {
+                            item.setPrice(numberFormat.parse(priceString).doubleValue());
+                        } catch (ParseException e2) {
+                            item.setPrice(0.0);
+                        }
+                    }
                 } else {
                     item.setPrice(0.0);
                 }
