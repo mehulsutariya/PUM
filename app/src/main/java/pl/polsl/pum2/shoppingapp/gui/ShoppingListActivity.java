@@ -144,7 +144,10 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDITOR_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                Snackbar.make(fab, getString(R.string.product_added), Snackbar.LENGTH_LONG).setCallback(snackbarCallback).show();
+                Integer quantity = data.getIntExtra(ListItemsEditorFragment.NUMBER_OF_ITEMS, 0);
+                if (quantity != null && quantity > 0) {
+                    Snackbar.make(fab, getResources().getQuantityString(R.plurals.number_of_products_added, quantity, quantity), Snackbar.LENGTH_LONG).setCallback(snackbarCallback).show();
+                }
             }
         }
     }

@@ -7,24 +7,33 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.Product;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
+import pl.polsl.pum2.shoppingapp.helpers.DoubleParser;
 
 
 public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditorAdapter.ViewHolder> {
 
     private List<ShoppingListItem> dataSource;
+    private Realm realm;
+    private Context context;
 
-    ListItemsEditorAdapter(List<ShoppingListItem> dataSource) {
+    ListItemsEditorAdapter(Context context, Realm realm, List<ShoppingListItem> dataSource) {
+        this.realm = realm;
+        this.context = context;
         this.dataSource = dataSource;
     }
 
@@ -43,15 +52,19 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
             holder.productName.setText(product.getName());
         }
         //TODO holder.productCategory
+        NumberFormat numberFormat = NumberFormat.getNumberInstance();
+        if (numberFormat instanceof DecimalFormat) {
+            ((DecimalFormat) numberFormat).setDecimalSeparatorAlwaysShown(false);
+        }
         if (dataSource.get(position).getPrice() == 0.0) {
             holder.price.setText("");
         } else {
-            holder.price.setText(String.format("%f", dataSource.get(position).getPrice()));
+            holder.price.setText(numberFormat.format(dataSource.get(position).getPrice()));
         }
         if (dataSource.get(position).getQuantity() == 0) {
             holder.quantity.setText("");
         } else {
-            holder.quantity.setText(String.format("%d", dataSource.get(position).getQuantity()));
+            holder.quantity.setText(numberFormat.format(dataSource.get(position).getQuantity()));
         }
 
     }
@@ -86,6 +99,19 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
             productName.addTextChangedListener(new TextListener(TextListener.PRODUCT_NAME, this));
             price.addTextChangedListener(new TextListener(TextListener.PRICE, this));
             quantity.addTextChangedListener(new TextListener(TextListener.QUANTITY, this));
+
+            RealmResults<Product> realmResults = realm.where(Product.class).findAll();
+            productName.setAdapter(new AutocompleteAdapter(context, realmResults));
+            productName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View arg1, int pos,
+                                        long id) {
+                    Product item = (Product) parent.getItemAtPosition(pos);
+                    productName.setText("");
+                    productName.append(item.getName());
+                }
+            });
         }
     }
 
@@ -126,15 +152,15 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
                             product = new Product();
                         }
                         realm.beginTransaction();
-                        product.setName(s.toString());
+                        product.setName(s.toString().trim());
                         realm.commitTransaction();
                         item.setProduct(product);
                         break;
                     case PRICE:
-                        item.setPrice(Double.parseDouble(s.toString()));
+                        item.setPrice(DoubleParser.parse(s.toString()));
                         break;
                     case QUANTITY:
-                        item.setQuantity(Integer.parseInt(s.toString()));
+                        item.setQuantity(DoubleParser.parse(s.toString()));
                         break;
                 }
             } catch (NumberFormatException e) {

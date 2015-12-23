@@ -15,7 +15,6 @@ import java.text.NumberFormat;
 
 import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
@@ -31,7 +30,6 @@ public class ShoppingListFragment extends Fragment {
     private OnFragmentInteractionListener listener;
     private RealmRecyclerView shoppingListRecyclerView;
     private ShoppingListAdapter shoppingListAdapter;
-    private ShoppingList shoppingList;
     private int positionOfItemToDelete;
     private int numberOfPositionsInEditMode;
     private Activity activity;
@@ -84,14 +82,14 @@ public class ShoppingListFragment extends Fragment {
     public void onStart() {
         super.onStart();
         realm = Realm.getDefaultInstance();
-            shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
+        ShoppingList shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
 
-            if (listType == SHOPPING_LIST) {
-                listItems = shoppingList.getItems().where().equalTo("isBought", false).findAll();
-            } else {
-                listItems = shoppingList.getItems().where().equalTo("isBought", true).findAll();
-            }
-            updatePriceSum();
+        if (listType == SHOPPING_LIST) {
+            listItems = shoppingList.getItems().where().equalTo("isBought", false).findAll();
+        } else {
+            listItems = shoppingList.getItems().where().equalTo("isBought", true).findAll();
+        }
+        updatePriceSum();
 
         setRecyclerViewAdapter();
     }
@@ -109,7 +107,7 @@ public class ShoppingListFragment extends Fragment {
     }
 
     private void setRecyclerViewAdapter() {
-        shoppingListAdapter = new ShoppingListAdapter(getContext(), listItems, true, false, listType);
+        shoppingListAdapter = new ShoppingListAdapter(getContext(), realm, listItems, true, true, listType);
         shoppingListAdapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
 
             @Override
@@ -143,20 +141,22 @@ public class ShoppingListFragment extends Fragment {
 
             @Override
             public void onBuyButton(final int position, final int listType) {
-                realm.beginTransaction();
-                ShoppingListItem item = listItems.get(position);
-                if (listType == SHOPPING_LIST) {
-                    item.setBought(true);
-                } else {
-                    item.setBought(false);
+                if (position >= 0) {
+                    realm.beginTransaction();
+                    ShoppingListItem item = listItems.get(position);
+                    if (listType == SHOPPING_LIST) {
+                        item.setBought(true);
+                    } else {
+                        item.setBought(false);
+                    }
+                    realm.commitTransaction();
+                    if (listType == SHOPPING_LIST) {
+                        listener.onItemBought();
+                    } else {
+                        listener.onItemRestoredToList();
+                    }
+                    updatePriceSum();
                 }
-                if (listType == SHOPPING_LIST) {
-                    listener.onItemBought();
-                } else {
-                    listener.onItemRestoredToList();
-                }
-                realm.commitTransaction();
-                updatePriceSum();
             }
         });
         shoppingListRecyclerView.setAdapter(shoppingListAdapter);
@@ -187,11 +187,9 @@ public class ShoppingListFragment extends Fragment {
 
     void removeItem() {
         realm.beginTransaction();
-        RealmList<ShoppingListItem> listItems = shoppingList.getItems();
         ShoppingListItem itemToDelete = listItems.get(positionOfItemToDelete);
         itemToDelete.removeFromRealm();
         realm.commitTransaction();
-        shoppingListAdapter.notifyItemRemoved(positionOfItemToDelete);
         listener.onItemRemoved();
         updatePriceSum();
     }

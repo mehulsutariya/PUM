@@ -70,7 +70,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/quantity"
                     android:imeOptions="actionDone"
-                    android:inputType="numberDecimal" />
+                    android:inputType="number"
+                    android:digits="0123456789.,"/>
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>

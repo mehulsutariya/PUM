@@ -1,6 +1,7 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 public class ListItemsEditorFragment extends Fragment {
 
     public static final String LIST_NAME = "listName";
+    public static final String NUMBER_OF_ITEMS = "itemsNumber";
     private static final String LAYOUT_MANAGER_STATE = "layoutManagerState";
     private static final String MESSAGE_DIALOG_TAG = "messageDialogTag";
     private List<ShoppingListItem> listItems;
@@ -76,11 +78,6 @@ public class ListItemsEditorFragment extends Fragment {
             recyclerViewLayoutManager.onRestoreInstanceState(state);
         }
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
-        listAdapter = new ListItemsEditorAdapter(listItems);
-        recyclerView.setAdapter(listAdapter);
-        if (listItems.size() == 0) {
-            insertNewItem();
-        }
         setupButtons();
         return view;
     }
@@ -90,6 +87,11 @@ public class ListItemsEditorFragment extends Fragment {
         super.onStart();
         realm = Realm.getDefaultInstance();
         shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
+        listAdapter = new ListItemsEditorAdapter(getContext(), realm, listItems);
+        recyclerView.setAdapter(listAdapter);
+        if (listItems.size() == 0) {
+            insertNewItem();
+        }
     }
 
     @Override
@@ -128,7 +130,9 @@ public class ListItemsEditorFragment extends Fragment {
                     showIncompleteFormMessageDialog();
                 } else {
                     saveList();
-                    activity.setResult(Activity.RESULT_OK);
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra(NUMBER_OF_ITEMS, listItems.size());
+                    activity.setResult(Activity.RESULT_OK, resultIntent);
                     activity.finish();
                 }
             }

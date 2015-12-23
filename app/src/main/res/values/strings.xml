@@ -9,7 +9,11 @@
     <string name="edit">Edytuj</string>
     <string name="sum">Suma:</string>
     <string name="empty_list">Lista zakupów jest pusta</string>
-    <string name="product_added">Dodano nowy produkt</string>
+    <plurals name="number_of_products_added">
+        <item quantity="one">Dodano %d nowy produkt</item>
+        <item quantity="few">Dodano %d nowe produkty</item>
+        <item quantity="other">Dodano %d nowych produktów</item>
+    </plurals>
     <string name="product_bought">Produkt przeniesiono do koszyka</string>
     <string name="product_restored_to_list">Produkt przeniesiono na listę zakupów</string>
     <string name="category">Kategoria</string>

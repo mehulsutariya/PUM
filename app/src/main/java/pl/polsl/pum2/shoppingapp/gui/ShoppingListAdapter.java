@@ -7,6 +7,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,9 +17,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmBasedRecyclerViewAdapter;
@@ -28,6 +28,7 @@ import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.Product;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
+import pl.polsl.pum2.shoppingapp.helpers.DoubleParser;
 
 
 class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem, ShoppingListAdapter.ViewHolder> {
@@ -37,10 +38,12 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
     OnItemClickListener itemClickListener;
     private Context context;
     private int listType;
+    private Realm realm;
 
-    public ShoppingListAdapter(Context context, RealmResults<ShoppingListItem> realmResults, boolean automaticUpdate, boolean animateIdType, int listType) {
+    public ShoppingListAdapter(Context context, Realm realm, RealmResults<ShoppingListItem> realmResults, boolean automaticUpdate, boolean animateIdType, int listType) {
         super(context, realmResults, automaticUpdate, animateIdType);
         this.context = context;
+        this.realm = realm;
         this.listType = listType;
     }
 
@@ -66,15 +69,18 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
             priceText = context.getString(R.string.no_price);
         }
         holder.price.setText(priceText);
+        numberFormat = NumberFormat.getNumberInstance();
+        if (numberFormat instanceof DecimalFormat) {
+            ((DecimalFormat) numberFormat).setDecimalSeparatorAlwaysShown(false);
+        }
         if (price > 0) {
-            numberFormat = NumberFormat.getNumberInstance();
             priceText = numberFormat.format(realmResults.get(position).getPrice());
         } else {
             priceText = "";
         }
         holder.priceEdit.setText(priceText);
-        holder.quantity.setText(String.format(context.getString(R.string.quantity_string), realmResults.get(position).getQuantity()));
-        holder.quantityEdit.setText(String.format("%d", realmResults.get(position).getQuantity()));
+        holder.quantity.setText(String.format(context.getString(R.string.quantity_string), numberFormat.format(realmResults.get(position).getQuantity())));
+        holder.quantityEdit.setText(numberFormat.format(realmResults.get(position).getQuantity()));
     }
 
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
@@ -149,6 +155,19 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
             if (listType == ShoppingListFragment.CART) {
                 buyButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_list_white_24dp));
             }
+
+            RealmResults<Product> realmResults = realm.where(Product.class).findAll();
+            productNameEdit.setAdapter(new AutocompleteAdapter(context, realmResults));
+            productNameEdit.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View arg1, int pos,
+                                        long id) {
+                    Product item = (Product) parent.getItemAtPosition(pos);
+                    productNameEdit.setText("");
+                    productNameEdit.append(item.getName());
+                }
+            });
         }
 
         @Override
@@ -213,7 +232,6 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
         private void insertEditedItemData(int position) throws InvalidItemValuesException {
             if (editedValuesAreValid()) {
                 ShoppingListItem item = realmResults.get(getAdapterPosition());
-                Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
                 Product newProductInRealm = null;
                 try {
@@ -232,25 +250,9 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
                     Product existingProduct = realm.where(Product.class).equalTo("name", productNameEdit.getText().toString().trim()).findFirst();
                     item.setProduct(existingProduct);
                 }
-                NumberFormat numberFormat = NumberFormat.getNumberInstance();
-                String priceString = priceEdit.getText().toString();
-                if (priceString.length() > 0) {
-                    try {
-                        item.setPrice(numberFormat.parse(priceString).doubleValue());
-                    } catch (ParseException e) {
-                        numberFormat = NumberFormat.getNumberInstance(Locale.US);
-                        try {
-                            item.setPrice(numberFormat.parse(priceString).doubleValue());
-                        } catch (ParseException e2) {
-                            item.setPrice(0.0);
-                        }
-                    }
-                } else {
-                    item.setPrice(0.0);
-                }
-                item.setQuantity(Integer.parseInt(quantityEdit.getText().toString().trim()));
+                item.setPrice(DoubleParser.parse(priceEdit.getText().toString()));
+                item.setQuantity(DoubleParser.parse(quantityEdit.getText().toString()));
                 realm.commitTransaction();
-                realm.close();
                 notifyItemChanged(position);
             } else {
                 throw new InvalidItemValuesException();

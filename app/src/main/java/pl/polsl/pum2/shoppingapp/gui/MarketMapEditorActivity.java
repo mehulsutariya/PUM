@@ -40,6 +40,6 @@ public class MarketMapEditorActivity extends AppCompatActivity {
     }
 
     public void addButtonClick(View view) {
-        //TODO
+
     }
 }
