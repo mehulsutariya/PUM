@@ -61,4 +61,7 @@
     <string name="listAlreadyExistsMessage">Lista o podanej nazwie już istnieje.</string>
     <string name="valuesInvalid">Wprowadzone wartości są nieprawidłowe.</string>
     <string name="noProducts">Brak produktów</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

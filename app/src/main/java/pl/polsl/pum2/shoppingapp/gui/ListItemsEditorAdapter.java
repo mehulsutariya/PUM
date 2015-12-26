@@ -22,7 +22,6 @@ import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.Product;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
-import pl.polsl.pum2.shoppingapp.helpers.DoubleParser;
 
 
 public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditorAdapter.ViewHolder> {
@@ -50,6 +49,8 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
         Product product = dataSource.get(position).getProduct();
         if (product != null) {
             holder.productName.setText(product.getName());
+        } else {
+            holder.productName.setText("");
         }
         //TODO holder.productCategory
         NumberFormat numberFormat = NumberFormat.getNumberInstance();
@@ -108,6 +109,7 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
                 public void onItemClick(AdapterView<?> parent, View arg1, int pos,
                                         long id) {
                     Product item = (Product) parent.getItemAtPosition(pos);
+                    //Po to aby kursor był na końcu zmienionego tekstu:
                     productName.setText("");
                     productName.append(item.getName());
                 }
@@ -157,10 +159,10 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
                         item.setProduct(product);
                         break;
                     case PRICE:
-                        item.setPrice(DoubleParser.parse(s.toString()));
+                        item.setPrice(Double.parseDouble(s.toString()));
                         break;
                     case QUANTITY:
-                        item.setQuantity(DoubleParser.parse(s.toString()));
+                        item.setQuantity(Double.parseDouble(s.toString()));
                         break;
                 }
             } catch (NumberFormatException e) {

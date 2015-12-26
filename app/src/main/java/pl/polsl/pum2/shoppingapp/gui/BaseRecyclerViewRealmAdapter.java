@@ -12,17 +12,19 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import io.realm.RealmBasedRecyclerViewAdapter;
+import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
 import pl.polsl.pum2.shoppingapp.R;
-import pl.polsl.pum2.shoppingapp.database.ShoppingList;
+import pl.polsl.pum2.shoppingapp.database.RealmObjectWithName;
 
-public class AllShoppingListsAdapter extends RealmBasedRecyclerViewAdapter<ShoppingList, AllShoppingListsAdapter.ViewHolder> {
+
+public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWithName> extends RealmBasedRecyclerViewAdapter<T, BaseRecyclerViewRealmAdapter<T>.ViewHolder> {
 
     Context context;
     OnItemClickListener itemClickListener;
 
-    AllShoppingListsAdapter(Context context, RealmResults<ShoppingList> realmResults, boolean automaticUpdate, boolean animateIdType) {
+    BaseRecyclerViewRealmAdapter(Context context, RealmResults<T> realmResults, boolean automaticUpdate, boolean animateIdType) {
         super(context, realmResults, automaticUpdate, animateIdType);
         this.context = context;
     }
@@ -37,8 +39,8 @@ public class AllShoppingListsAdapter extends RealmBasedRecyclerViewAdapter<Shopp
 
     @Override
     public void onBindRealmViewHolder(ViewHolder holder, int position) {
-        ShoppingList shoppingList = realmResults.get(position);
-        holder.listName.setText(shoppingList.getName());
+        T item = realmResults.get(position);
+        holder.itemName.setText(item.getName());
     }
 
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
@@ -47,21 +49,24 @@ public class AllShoppingListsAdapter extends RealmBasedRecyclerViewAdapter<Shopp
 
     public interface OnItemClickListener {
         void onListItemClick(int position);
+
+        boolean onListItemLongClick(int position);
     }
 
-    public class ViewHolder extends RealmViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+    public class ViewHolder extends RealmViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, View.OnLongClickListener {
 
-        TextView listName;
+        TextView itemName;
         ImageButton itemMenuButton;
         CardView listItem;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            listName = (TextView) itemView.findViewById(R.id.item_name);
+            itemName = (TextView) itemView.findViewById(R.id.item_name);
             itemMenuButton = (ImageButton) itemView.findViewById(R.id.item_menu);
             listItem = (CardView) itemView.findViewById(R.id.list_item);
             itemMenuButton.setOnClickListener(this);
             listItem.setOnClickListener(this);
+            listItem.setOnLongClickListener(this);
         }
 
         @Override
@@ -70,12 +75,20 @@ public class AllShoppingListsAdapter extends RealmBasedRecyclerViewAdapter<Shopp
             int position = getAdapterPosition();
             switch (viewId) {
                 case R.id.list_item:
-                    itemClickListener.onListItemClick(position);
+                    if (itemClickListener != null) {
+                        itemClickListener.onListItemClick(position);
+                    }
                     break;
                 case R.id.item_menu:
                     showPopupMenu(v);
                     break;
             }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            view.setSelected(true);
+            return itemClickListener.onListItemLongClick(getAdapterPosition());
         }
 
 
@@ -101,3 +114,4 @@ public class AllShoppingListsAdapter extends RealmBasedRecyclerViewAdapter<Shopp
         }
     }
 }
+

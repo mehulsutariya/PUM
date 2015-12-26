@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.RealmClass;
 
 @RealmClass
-public class MarketMap extends RealmObject {
+public class MarketMap extends RealmObject implements RealmObjectWithName {
     @PrimaryKey
     private String name;
     private RealmList<ProductCategory> productCategories;

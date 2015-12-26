@@ -55,8 +55,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/shopping_list_price"
                     android:imeOptions="actionDone"
-                    android:inputType="number"
-                    android:digits="0123456789.,"/>
+                    android:inputType="numberDecimal" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -70,8 +69,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/quantity"
                     android:imeOptions="actionDone"
-                    android:inputType="number"
-                    android:digits="0123456789.,"/>
+                    android:inputType="numberDecimal" />
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>

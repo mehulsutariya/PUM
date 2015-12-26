@@ -5,7 +5,7 @@ import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.RealmClass;
 
 @RealmClass
-public class ProductCategory extends RealmObject {
+public class ProductCategory extends RealmObject implements RealmObjectWithName {
     @PrimaryKey
     private String name;
 

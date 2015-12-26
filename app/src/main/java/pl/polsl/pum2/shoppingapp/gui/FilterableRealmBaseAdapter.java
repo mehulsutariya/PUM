@@ -29,6 +29,7 @@ public abstract class FilterableRealmBaseAdapter<T extends RealmObject> extends 
 
     @Override
     public T getItem(int position) {
+        mResults.get(position);
         return mResults == null ? null : mResults.get(position);
     }
 

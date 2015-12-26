@@ -31,11 +31,11 @@
             android:name=".gui.ShoppingListEditorActivity"
             android:label="@string/title_activity_create_or_edit_list"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateUnchanged|adjustPan"></activity>
+            android:windowSoftInputMode="stateUnchanged|adjustResize"></activity>
         <activity
             android:name=".gui.MarketMapEditorActivity"
             android:label="@string/title_activity_create_or_edit_map"
-            android:windowSoftInputMode="stateUnchanged|adjustPan"></activity>
+            android:windowSoftInputMode="stateUnchanged|adjustResize"></activity>
     </application>
 
 </manifest>
