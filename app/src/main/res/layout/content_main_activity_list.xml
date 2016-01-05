@@ -8,7 +8,7 @@
     <android.support.v7.widget.CardView
         android:id="@+id/list_item"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:foreground="?android:attr/selectableItemBackground">
 
@@ -28,7 +28,7 @@
                     android:layout_marginStart="10dp"
                     android:textSize="20sp"
                     app:layout_column="1"
-                    app:layout_columnWeight="0.95"
+                    app:layout_columnWeight="0.80"
                     app:layout_gravity="center_vertical"
                     app:layout_row="0" />
 
@@ -58,7 +58,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <TextView
+                        <EditText
                             android:id="@+id/item_name_edit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

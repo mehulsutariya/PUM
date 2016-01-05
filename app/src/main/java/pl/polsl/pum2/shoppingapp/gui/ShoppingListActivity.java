@@ -20,7 +20,6 @@ import pl.polsl.pum2.shoppingapp.R;
 public class ShoppingListActivity extends AppCompatActivity implements ShoppingListFragment.OnFragmentInteractionListener {
     public final static String LIST_NAME = "listName";
     private final static String EDIT_MODE_STATE = "editMode";
-    private final static int EDITOR_ACTIVITY_REQUEST_CODE = 1;
     private FloatingActionButton fab;
     private TextView boughtProductsPriceSum;
     private CoordinatorLayout.LayoutParams fabLayoutParams;
@@ -69,14 +68,8 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
             public void onPageSelected(int position) {
                 if (position == 0) {
                     currentListType = ShoppingListFragment.SHOPPING_LIST;
-                    if (!editModeOn) {
-                        showFloatingActionButton();
-                    }
-                    fabLayoutParams.setBehavior(scrollFABBehavior);
                 } else {
                     currentListType = ShoppingListFragment.CART;
-                    fab.hide();
-                    fabLayoutParams.setBehavior(defaultFABBehavior);
                 }
             }
         });
@@ -99,14 +92,12 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
     }
 
     private void showFloatingActionButton() {
-        if (currentListType == ShoppingListFragment.SHOPPING_LIST) {
-            fab.show();
-            //korekta pozycji,
-            //bez tego floating action button pojawia się w złym miejscu,
-            // gdy został ukryty przy widocznym snackbarze
-            if (!snackbarIsVisible) {
-                fab.setTranslationY(0.0f);
-            }
+        fab.show();
+        //korekta pozycji,
+        //bez tego floating action button pojawia się w złym miejscu,
+        // gdy został ukryty przy widocznym snackbarze
+        if (!snackbarIsVisible) {
+            fab.setTranslationY(0.0f);
         }
     }
 
@@ -123,17 +114,19 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
             @Override
             public void onClick(View view) {
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        ShoppingListActivity.this, fab, "transition_create_or_edit_list");
-                Intent intent = new Intent(ShoppingListActivity.this, ShoppingListEditorActivity.class);
-                intent.putExtra(ShoppingListEditorActivity.MODE, ShoppingListEditorActivity.ADD_LIST_ITEMS);
-                intent.putExtra(ShoppingListEditorActivity.LIST_NAME, listName);
-                ActivityCompat.startActivityForResult(ShoppingListActivity.this, intent, EDITOR_ACTIVITY_REQUEST_CODE, options.toBundle());
+                        ShoppingListActivity.this, fab, "transition_edit_list");
+                Intent intent = new Intent(ShoppingListActivity.this, ListEditorActivity.class);
+                intent.putExtra(ListEditorActivity.LIST_NAME, listName);
+                if (currentListType == ShoppingListFragment.CART) {
+                    intent.putExtra(ListEditorActivity.MODE, ListEditorActivity.EDIT_SHOPPING_CART);
+                }
+                ActivityCompat.startActivityForResult(ShoppingListActivity.this, intent, ListEditorActivity.EDIT_EXISTING_LIST, options.toBundle());
             }
         });
-        setFABLayoutParams();
+        setFabLayoutParams();
     }
 
-    private void setFABLayoutParams() {
+    private void setFabLayoutParams() {
         fabLayoutParams = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
         defaultFABBehavior = fabLayoutParams.getBehavior();
         scrollFABBehavior = new ScrollFabBehavior();
@@ -142,9 +135,9 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == EDITOR_ACTIVITY_REQUEST_CODE) {
+        if (requestCode == ListEditorActivity.EDIT_EXISTING_LIST) {
             if (resultCode == Activity.RESULT_OK) {
-                Integer quantity = data.getIntExtra(ListItemsEditorFragment.NUMBER_OF_ITEMS, 0);
+                Integer quantity = data.getIntExtra(ListEditorActivity.NUMBER_OF_ITEMS, 0);
                 if (quantity != null && quantity > 0) {
                     Snackbar.make(fab, getResources().getQuantityString(R.plurals.number_of_products_added, quantity, quantity), Snackbar.LENGTH_LONG).setCallback(snackbarCallback).show();
                 }
@@ -160,20 +153,16 @@ public class ShoppingListActivity extends AppCompatActivity implements ShoppingL
 
     @Override
     public void onEnterEditMode() {
-        if (currentListType == ShoppingListFragment.SHOPPING_LIST) {
-            fab.hide();
-            fabLayoutParams.setBehavior(defaultFABBehavior);
-            editModeOn = true;
-        }
+        fab.hide();
+        fabLayoutParams.setBehavior(defaultFABBehavior);
+        editModeOn = true;
     }
 
     @Override
     public void onExitEditMode() {
-        if (currentListType == ShoppingListFragment.SHOPPING_LIST) {
-            showFloatingActionButton();
-            fabLayoutParams.setBehavior(scrollFABBehavior);
-            editModeOn = false;
-        }
+        showFloatingActionButton();
+        fabLayoutParams.setBehavior(scrollFABBehavior);
+        editModeOn = false;
     }
 
     @Override

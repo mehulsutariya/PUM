@@ -7,14 +7,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
+import io.realm.Realm;
 import io.realm.RealmBasedRecyclerViewAdapter;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
+import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.RealmObjectWithName;
 
@@ -41,6 +46,7 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
     public void onBindRealmViewHolder(ViewHolder holder, int position) {
         T item = realmResults.get(position);
         holder.itemName.setText(item.getName());
+        holder.itemNameEdit.setText(item.getName());
     }
 
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
@@ -51,6 +57,12 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
         void onListItemClick(int position);
 
         boolean onListItemLongClick(int position);
+
+        void onDelete(int position);
+
+        void onItemEdit();
+
+        void onItemEditFailed(int position);
     }
 
     public class ViewHolder extends RealmViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, View.OnLongClickListener {
@@ -58,15 +70,30 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
         TextView itemName;
         ImageButton itemMenuButton;
         CardView listItem;
+        EditText itemNameEdit;
+        Button doneButton;
+        Button cancelButton;
+        ImageButton clearButton;
+        ViewFlipper viewFlipper;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
             itemName = (TextView) itemView.findViewById(R.id.item_name);
             itemMenuButton = (ImageButton) itemView.findViewById(R.id.item_menu);
             listItem = (CardView) itemView.findViewById(R.id.list_item);
+            itemNameEdit = (EditText) itemView.findViewById(R.id.item_name_edit);
+            doneButton = (Button) itemView.findViewById(R.id.done_button);
+            cancelButton = (Button) itemView.findViewById(R.id.cancel_button);
+            clearButton = (ImageButton) itemView.findViewById(R.id.clear_item_name);
+            viewFlipper = (ViewFlipper) itemView.findViewById(R.id.view_flipper);
             itemMenuButton.setOnClickListener(this);
             listItem.setOnClickListener(this);
             listItem.setOnLongClickListener(this);
+            doneButton.setOnClickListener(this);
+            cancelButton.setOnClickListener(this);
+            clearButton.setOnClickListener(this);
+            viewFlipper.setMeasureAllChildren(false);
         }
 
         @Override
@@ -82,13 +109,59 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
                 case R.id.item_menu:
                     showPopupMenu(v);
                     break;
+                case R.id.done_button:
+                    insertEditedItemData(position);
+                    break;
+                case R.id.cancel_button:
+                    exitEditMode();
+                    cancelEditChanges(position);
+                    break;
+                case R.id.clear_item_name:
+                    itemNameEdit.setText("");
             }
+        }
+
+        private void exitEditMode() {
+            viewFlipper.showPrevious();
+            listItem.setOnClickListener(this);
+            listItem.setOnLongClickListener(this);
+        }
+
+        private void insertEditedItemData(int position) {
+            if (editedValuesAreValid()) {
+                T item = realmResults.get(getAdapterPosition());
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                try {
+                    item.setName(itemNameEdit.getText().toString().trim());
+                    realm.commitTransaction();
+                    notifyItemChanged(position);
+                    exitEditMode();
+                } catch (RealmPrimaryKeyConstraintException e) {
+                    realm.cancelTransaction();
+                    itemClickListener.onItemEditFailed(position);
+                }
+                realm.close();
+            }
+        }
+
+        private void cancelEditChanges(int position) {
+            T item = realmResults.get(position);
+            itemNameEdit.setText(item.getName());
+        }
+
+        private boolean editedValuesAreValid() {
+            String productName = itemNameEdit.getText().toString().trim();
+            return (productName.length() != 0);
         }
 
         @Override
         public boolean onLongClick(View view) {
             view.setSelected(true);
-            return itemClickListener.onListItemLongClick(getAdapterPosition());
+            if (itemClickListener != null) {
+                return itemClickListener.onListItemLongClick(getAdapterPosition());
+            }
+            return false;
         }
 
 
@@ -104,13 +177,22 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.edit:
-                    //TODO
+                    enterEditMode();
                     break;
                 case R.id.delete:
-                    //TODO
+                    if (itemClickListener != null) {
+                        itemClickListener.onDelete(getAdapterPosition());
+                    }
                     break;
             }
             return false;
+        }
+
+        private void enterEditMode() {
+            viewFlipper.showNext();
+            listItem.setOnClickListener(null);
+            listItem.setOnLongClickListener(null);
+            itemClickListener.onItemEdit();
         }
     }
 }

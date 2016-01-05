@@ -20,7 +20,7 @@ import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
-public class ShoppingListFragment extends Fragment {
+public class ShoppingListFragment extends Fragment implements DeleteItemDialogFragment.DeleteItemDialogListener {
 
     public final static int SHOPPING_LIST = 0;
     public final static int CART = 1;
@@ -112,8 +112,7 @@ public class ShoppingListFragment extends Fragment {
 
             @Override
             public void onDeleteButton(int position) {
-                DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(shoppingListAdapter.getItemName(position));
-                deleteItemDialogFragment.setTargetFragment(ShoppingListFragment.this, 1);
+                DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_product_message), shoppingListAdapter.getItemName(position), ShoppingListFragment.this);
                 deleteItemDialogFragment.show(getActivity().getSupportFragmentManager(), "deleteItemDialogTag");
                 positionOfItemToDelete = position;
             }
@@ -185,7 +184,8 @@ public class ShoppingListFragment extends Fragment {
         }
     }
 
-    void removeItem() {
+    @Override
+    public void onDeleteItemDialogOK() {
         realm.beginTransaction();
         ShoppingListItem itemToDelete = listItems.get(positionOfItemToDelete);
         itemToDelete.removeFromRealm();
@@ -194,7 +194,8 @@ public class ShoppingListFragment extends Fragment {
         updatePriceSum();
     }
 
-    void cancelItemRemoving() {
+    @Override
+    public void onDeleteItemDialogCancel() {
         listener.onItemRemovingCanceled();
     }
 

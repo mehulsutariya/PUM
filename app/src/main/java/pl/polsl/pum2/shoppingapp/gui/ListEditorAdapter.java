@@ -17,27 +17,26 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
-import io.realm.Realm;
 import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.Product;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
 
-public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditorAdapter.ViewHolder> {
+public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.ViewHolder> {
 
     private List<ShoppingListItem> dataSource;
-    private Realm realm;
     private Context context;
+    private RealmResults<Product> products;
 
-    ListItemsEditorAdapter(Context context, Realm realm, List<ShoppingListItem> dataSource) {
-        this.realm = realm;
+    ListEditorAdapter(Context context, List<ShoppingListItem> dataSource, RealmResults<Product> products) {
         this.context = context;
         this.dataSource = dataSource;
+        this.products = products;
     }
 
     @Override
-    public ListItemsEditorAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ListEditorAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View shoppingListView = inflater.inflate(R.layout.content_list_item_editor, parent, false);
@@ -101,8 +100,7 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
             price.addTextChangedListener(new TextListener(TextListener.PRICE, this));
             quantity.addTextChangedListener(new TextListener(TextListener.QUANTITY, this));
 
-            RealmResults<Product> realmResults = realm.where(Product.class).findAll();
-            productName.setAdapter(new AutocompleteAdapter(context, realmResults));
+            productName.setAdapter(new AutocompleteAdapter(context, products));
             productName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                 @Override
@@ -145,7 +143,6 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
         @Override
         public void afterTextChanged(Editable s) {
             ShoppingListItem item = dataSource.get(viewHolder.getAdapterPosition());
-            Realm realm = Realm.getDefaultInstance();
             try {
                 switch (type) {
                     case PRODUCT_NAME:
@@ -153,9 +150,11 @@ public class ListItemsEditorAdapter extends RecyclerView.Adapter<ListItemsEditor
                         if (product == null) {
                             product = new Product();
                         }
-                        realm.beginTransaction();
+                        //Realm realm = Realm.getDefaultInstance();
+                        //realm.beginTransaction();
                         product.setName(s.toString().trim());
-                        realm.commitTransaction();
+                        //realm.commitTransaction();
+                        //realm.close();
                         item.setProduct(product);
                         break;
                     case PRICE:

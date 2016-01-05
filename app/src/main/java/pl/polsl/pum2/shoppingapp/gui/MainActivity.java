@@ -2,6 +2,7 @@ package pl.polsl.pum2.shoppingapp.gui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -19,7 +20,7 @@ import android.view.View;
 import pl.polsl.pum2.shoppingapp.R;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, BaseRealmRecyclerViewFragment.OnFragmentInteractionListener {
 
     private static final String SHOPPING_LISTS_FRAGMENT = "shoppingListsFragment";
     private static final String PRODUCTS_FRAGMENT = "productsFragment";
@@ -32,6 +33,10 @@ public class MainActivity extends AppCompatActivity
     private MarketMapsFragment marketMapsFragment;
     private FragmentManager fragmentManager;
     private int navigationViewCheckedItem;
+    private FloatingActionButton fab;
+    private CoordinatorLayout.LayoutParams fabLayoutParams;
+    private CoordinatorLayout.Behavior defaultFABBehavior;
+    private CoordinatorLayout.Behavior scrollFABBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,16 +55,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupFloatingActionButton() {
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ShoppingListEditorActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ListCreatorActivity.class);
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        MainActivity.this, fab, "transition_create_or_edit_list");
+                        MainActivity.this, fab, "transition_create_list");
                 ActivityCompat.startActivity(MainActivity.this, intent, options.toBundle());
             }
         });
+        setFabLayoutParams();
+    }
+
+    private void setFabLayoutParams() {
+        fabLayoutParams = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+        defaultFABBehavior = fabLayoutParams.getBehavior();
+        scrollFABBehavior = new ScrollFabBehavior();
+        fabLayoutParams.setBehavior(scrollFABBehavior);
     }
 
     private void setupDrawerLayout(Toolbar toolbar) {
@@ -116,6 +129,11 @@ public class MainActivity extends AppCompatActivity
                 tag = MARKET_MAPS_FRAGMENT;
                 break;
         }
+        if (navigationViewCheckedItem == R.id.nav_shopping_lists) {
+            fab.show();
+        } else {
+            fab.hide();
+        }
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, newFragment, tag)
                 .commit();
@@ -145,5 +163,18 @@ public class MainActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(NAVIGATION_VIEW_CHECKED_ITEM, navigationViewCheckedItem);
+    }
+
+    @Override
+    public void onEnterEditMode() {
+        fabLayoutParams.setBehavior(defaultFABBehavior);
+        fab.hide();
+    }
+
+    public void onExitEditMode() {
+        fabLayoutParams.setBehavior(scrollFABBehavior);
+        if (navigationViewCheckedItem == R.id.nav_shopping_lists) {
+            fab.show();
+        }
     }
 }

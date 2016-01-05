@@ -25,7 +25,8 @@
     <string name="quantity">Ilość</string>
 
     <!-- Okno dialogowe przy usuwaniu pozycji z listy: -->
-    <string name="delete_dialog_message">Czy usunąć produkt &lt;b>%s&lt;/b>?</string>
+    <string name="delete_product_message">Czy usunąć produkt</string>
+    <string name="delete_list_message">Czy usunąć listę</string>
     <string name="delete">Usuń</string>
     <string name="cancel_button">Anuluj</string>
     <string name="title_activity_main">MainActivity</string>
@@ -59,8 +60,9 @@
     <string name="new_items_fragment_message">Wprowadź wymagane dane:\n\t&#8226; nazwę produktu,\n\t&#8226; ilość,\n\t&#8226; kategorię.</string>
     <string name="quantity_string">x%1s</string>
     <string name="listAlreadyExistsMessage">Lista o podanej nazwie już istnieje.</string>
-    <string name="valuesInvalid">Wprowadzone wartości są nieprawidłowe.</string>
+    <string name="valuesInvalid">Podane wartości są nieprawidłowe.</string>
     <string name="noProducts">Brak produktów</string>
+    <string name="nameAlreadyExists">Podana nazwa już istnieje. Wpisz inną.</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

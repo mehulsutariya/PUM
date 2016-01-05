@@ -8,7 +8,7 @@ import java.util.List;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
 
-public class ListItemsEditorDataFragment extends Fragment {
+public class ListEditorDataFragment extends Fragment {
 
     private List<ShoppingListItem> listItems;
 

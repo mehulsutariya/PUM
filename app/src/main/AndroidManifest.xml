@@ -28,14 +28,29 @@
                 android:value="pl.polsl.pum2.shoppingapp.gui.MainActivity" />
         </activity>
         <activity
-            android:name=".gui.ShoppingListEditorActivity"
-            android:label="@string/title_activity_create_or_edit_list"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateUnchanged|adjustResize"></activity>
-        <activity
             android:name=".gui.MarketMapEditorActivity"
             android:label="@string/title_activity_create_or_edit_map"
             android:windowSoftInputMode="stateUnchanged|adjustResize"></activity>
+        <activity
+            android:name=".gui.ListCreatorActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".gui.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateUnchanged|adjustResize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pl.polsl.pum2.shoppingapp.gui.MainActivity" />
+        </activity>
+        <activity
+            android:name=".gui.ListEditorActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".gui.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateUnchanged|adjustResize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pl.polsl.pum2.shoppingapp.gui.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

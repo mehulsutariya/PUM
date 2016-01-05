@@ -1,12 +1,10 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -16,49 +14,42 @@ import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
 
 
-public class ListEditorFragment extends Fragment {
+public class ListCreatorActivity extends AppCompatActivity {
 
-    private static final String MESSAGE_DIALOG_TAG = "pl.polsl.pum2.shoppingapp.gui.ListEditorFragment.messageDialogTag";
-    OnFragmentInteractionListener listener;
+    private static final String MESSAGE_DIALOG_TAG = "pl.polsl.pum2.shoppingapp.gui.ListCreatorActivity.messageDialogTag";
     private EditText listName;
     private Realm realm;
-
-    public ListEditorFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list_editor, container, false);
-        listName = (EditText) view.findViewById(R.id.shopping_list_name);
-        Button newMarketMapButton = (Button) view.findViewById(R.id.newMarketMapButton);
+        setContentView(R.layout.activity_list_creator);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        listName = (EditText) findViewById(R.id.shopping_list_name);
+        Button newMarketMapButton = (Button) findViewById(R.id.newMarketMapButton);
         newMarketMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createOrEditMarketMap();
             }
         });
-        Button editMarketMapButton = (Button) view.findViewById(R.id.editMarketMapButton);
+        Button editMarketMapButton = (Button) findViewById(R.id.editMarketMapButton);
         editMarketMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createOrEditMarketMap();
             }
         });
-        Button doneButton = (Button) view.findViewById(R.id.done_button);
+        Button doneButton = (Button) findViewById(R.id.done_button);
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (formIsCompleted()) {
                     try {
                         saveList();
-                        getActivity().finish();
+                        finish();
                     } catch (RealmPrimaryKeyConstraintException e) {
                         showExistingListMessageDialog();
                     }
@@ -67,16 +58,16 @@ public class ListEditorFragment extends Fragment {
                 }
             }
         });
-        Button addProductsButton = (Button) view.findViewById(R.id.add_products_button);
+        Button addProductsButton = (Button) findViewById(R.id.add_products_button);
         addProductsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (formIsCompleted()) {
                     try {
                         saveList();
-                        ShoppingListEditorActivity activity = (ShoppingListEditorActivity) getActivity();
-                        activity.setListName(listName.getText().toString());
-                        listener.onEditList();
+                        Intent intent = new Intent(ListCreatorActivity.this, ListEditorActivity.class);
+                        intent.putExtra(ListEditorActivity.LIST_NAME, listName.getText().toString().trim());
+                        startActivityForResult(intent, ListEditorActivity.EDIT_NEW_LIST);
                     } catch (RealmPrimaryKeyConstraintException e) {
                         showExistingListMessageDialog();
                     }
@@ -85,61 +76,36 @@ public class ListEditorFragment extends Fragment {
                 }
             }
         });
-        return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
         realm = Realm.getDefaultInstance();
     }
 
+
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroy() {
+        super.onDestroy();
         realm.close();
     }
 
     private void saveList() throws RealmPrimaryKeyConstraintException {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                ShoppingList list = realm.createObject(ShoppingList.class);
-                list.setName(listName.getText().toString().trim());
-            }
-        });
+        realm.beginTransaction();
+        ShoppingList list = realm.createObject(ShoppingList.class);
+        list.setName(listName.getText().toString().trim());
+        realm.commitTransaction();
     }
 
     private void showExistingListMessageDialog() {
         MessageDialogFragment dialogFragment = MessageDialogFragment.newInstance(getString(R.string.listAlreadyExistsMessage));
-        dialogFragment.show(getFragmentManager(), "listExistsMessage");
+        dialogFragment.show(getSupportFragmentManager(), "listExistsMessage");
     }
 
     private void createOrEditMarketMap() {
-        Intent intent = new Intent(getActivity(), MarketMapEditorActivity.class);
-        getActivity().startActivity(intent);
+        Intent intent = new Intent(this, MarketMapEditorActivity.class);
+        startActivity(intent);
     }
 
     private void showIncompleteFormMessageDialog() {
         MessageDialogFragment messageDialogFragment = MessageDialogFragment.newInstance(getString(R.string.new_list_form_message));
-        messageDialogFragment.show(getActivity().getSupportFragmentManager(), MESSAGE_DIALOG_TAG);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            listener = (OnFragmentInteractionListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
+        messageDialogFragment.show(getSupportFragmentManager(), MESSAGE_DIALOG_TAG);
     }
 
     boolean formIsCompleted() {
@@ -147,8 +113,14 @@ public class ListEditorFragment extends Fragment {
         return listName.length() != 0;
     }
 
-    public interface OnFragmentInteractionListener {
-        void onEditList();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == ListEditorActivity.EDIT_NEW_LIST) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
+        }
     }
 
 }
