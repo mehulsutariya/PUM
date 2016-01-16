@@ -6,9 +6,11 @@ import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.RealmClass;
 
 @RealmClass
-public class ShoppingList extends RealmObject implements RealmObjectWithName {
+public class ShoppingList extends RealmObject implements CheckableRealmObjectWithName {
     @PrimaryKey
     private String name;
+    private boolean checked;
+
     private RealmList<ShoppingListItem> items;
 
     public String getName() {
@@ -25,5 +27,13 @@ public class ShoppingList extends RealmObject implements RealmObjectWithName {
 
     public void setItems(RealmList<ShoppingListItem> items) {
         this.items = items;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 }

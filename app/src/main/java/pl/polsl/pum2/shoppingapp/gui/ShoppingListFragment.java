@@ -85,9 +85,9 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
         ShoppingList shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
 
         if (listType == SHOPPING_LIST) {
-            listItems = shoppingList.getItems().where().equalTo("isBought", false).findAll();
+            listItems = shoppingList.getItems().where().equalTo("isBought", false).isNotNull("product").findAll();
         } else {
-            listItems = shoppingList.getItems().where().equalTo("isBought", true).findAll();
+            listItems = shoppingList.getItems().where().equalTo("isBought", true).isNotNull("product").findAll();
         }
         updatePriceSum();
 

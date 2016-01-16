@@ -22,6 +22,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <CheckBox
+                    android:id="@+id/checkbox"
+                    app:layout_column="0"
+                    app:layout_row="0"/>
+
                 <TextView
                     android:id="@+id/item_name"
                     android:layout_marginLeft="10dp"

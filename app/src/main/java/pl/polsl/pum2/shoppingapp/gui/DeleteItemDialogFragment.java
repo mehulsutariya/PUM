@@ -16,16 +16,26 @@ public class DeleteItemDialogFragment extends DialogFragment {
 
     public static final String ITEM_NAME = "itemName";
     public static final String MESSAGE = "message";
+    public static final String EXTENDED_MESSAGE = "extendedMessage";
 
-    public static DeleteItemDialogFragment newInstance(String message, String itemName, Fragment targetFragment) {
+    public static DeleteItemDialogFragment newInstance(String message, String extendedMessage, String itemName, Fragment targetFragment) {
         DeleteItemDialogFragment dialogFragment = new DeleteItemDialogFragment();
         Bundle arguments = new Bundle();
         arguments.putString(MESSAGE, message);
         arguments.putString(ITEM_NAME, itemName);
+        arguments.putString(EXTENDED_MESSAGE, extendedMessage);
         dialogFragment.setArguments(arguments);
         dialogFragment.setTargetFragment(targetFragment, 1);
 
         return dialogFragment;
+    }
+
+    public static DeleteItemDialogFragment newInstance(String message, String itemName, Fragment targetFragment) {
+        return newInstance(message, null, itemName, targetFragment);
+    }
+
+    public static DeleteItemDialogFragment newInstance(String message, Fragment targetFragment) {
+        return newInstance(message, null, null, targetFragment);
     }
 
     @Override
@@ -36,8 +46,13 @@ public class DeleteItemDialogFragment extends DialogFragment {
         Bundle arguments = getArguments();
         String message = arguments.getString(MESSAGE, "");
         String itemName = arguments.getString(ITEM_NAME, "");
-
-        String dialogMessage = String.format("%s <b>%s</b>?", message, itemName);
+        String extendedMessage = arguments.getString(EXTENDED_MESSAGE, "");
+        String dialogMessage;
+        if (itemName.length() > 0) {
+            dialogMessage = String.format("%s <b>%s</b>?\n%s", message, itemName, extendedMessage);
+        } else {
+            dialogMessage = String.format("%s?\n%s", message, extendedMessage);
+        }
         builder.setMessage(Html.fromHtml(dialogMessage))
                 .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {

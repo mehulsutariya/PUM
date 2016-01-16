@@ -9,6 +9,7 @@ import pl.polsl.pum2.shoppingapp.database.Product;
 public class ProductsFragment extends BaseRealmRecyclerViewFragment<Product> implements DeleteItemDialogFragment.DeleteItemDialogListener {
 
     int positionOfItemToDelete;
+    private boolean isRemovingCheckedItems;
 
     public ProductsFragment() {
         // Required empty public constructor
@@ -23,13 +24,25 @@ public class ProductsFragment extends BaseRealmRecyclerViewFragment<Product> imp
     @Override
     protected void onRecyclerViewItemDelete(int position) {
         positionOfItemToDelete = position;
-        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_product_message), getListItems().get(position).getName(), this);
+        isRemovingCheckedItems = false;
+        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_product_message), getString(R.string.delete_product_extended_message), getListItems().get(position).getName(), this);
+        deleteItemDialogFragment.show(getActivity().getSupportFragmentManager(), "deleteItemDialogTag");
+    }
+
+    @Override
+    protected void onRecyclerViewCheckedItemsDelete() {
+        isRemovingCheckedItems = true;
+        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_multiple_products_message), getString(R.string.delete_multiple_products_extended_message), null, this);
         deleteItemDialogFragment.show(getActivity().getSupportFragmentManager(), "deleteItemDialogTag");
     }
 
     @Override
     public void onDeleteItemDialogOK() {
-        removeItem(positionOfItemToDelete);
+        if (isRemovingCheckedItems) {
+            removeCheckedItems();
+        } else {
+            removeItem(positionOfItemToDelete);
+        }
     }
 
     @Override

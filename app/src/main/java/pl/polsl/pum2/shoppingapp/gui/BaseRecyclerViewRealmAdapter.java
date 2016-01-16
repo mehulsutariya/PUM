@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
@@ -21,10 +23,10 @@ import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
 import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
-import pl.polsl.pum2.shoppingapp.database.RealmObjectWithName;
+import pl.polsl.pum2.shoppingapp.database.CheckableRealmObjectWithName;
 
 
-public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWithName> extends RealmBasedRecyclerViewAdapter<T, BaseRecyclerViewRealmAdapter<T>.ViewHolder> {
+public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealmObjectWithName> extends RealmBasedRecyclerViewAdapter<T, BaseRecyclerViewRealmAdapter<T>.ViewHolder> {
 
     Context context;
     OnItemClickListener itemClickListener;
@@ -47,11 +49,17 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
         T item = realmResults.get(position);
         holder.itemName.setText(item.getName());
         holder.itemNameEdit.setText(item.getName());
+        if (item.isChecked()) {
+            holder.checkBox.setChecked(true);
+        } else {
+            holder.checkBox.setChecked(false);
+        }
     }
 
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
+
 
     public interface OnItemClickListener {
         void onListItemClick(int position);
@@ -63,9 +71,13 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
         void onItemEdit();
 
         void onItemEditFailed(int position);
+
+        void onItemChecked(int position);
+
+        void onItemUnchecked(int position);
     }
 
-    public class ViewHolder extends RealmViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, View.OnLongClickListener {
+    public class ViewHolder extends RealmViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, View.OnLongClickListener, CompoundButton.OnCheckedChangeListener {
 
         TextView itemName;
         ImageButton itemMenuButton;
@@ -75,6 +87,7 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
         Button cancelButton;
         ImageButton clearButton;
         ViewFlipper viewFlipper;
+        CheckBox checkBox;
 
 
         public ViewHolder(View itemView) {
@@ -87,6 +100,7 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
             cancelButton = (Button) itemView.findViewById(R.id.cancel_button);
             clearButton = (ImageButton) itemView.findViewById(R.id.clear_item_name);
             viewFlipper = (ViewFlipper) itemView.findViewById(R.id.view_flipper);
+            checkBox = (CheckBox) itemView.findViewById(R.id.checkbox);
             itemMenuButton.setOnClickListener(this);
             listItem.setOnClickListener(this);
             listItem.setOnLongClickListener(this);
@@ -94,6 +108,7 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
             cancelButton.setOnClickListener(this);
             clearButton.setOnClickListener(this);
             viewFlipper.setMeasureAllChildren(false);
+            checkBox.setOnCheckedChangeListener(this);
         }
 
         @Override
@@ -118,6 +133,19 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & RealmObjectWit
                     break;
                 case R.id.clear_item_name:
                     itemNameEdit.setText("");
+            }
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (isChecked) {
+                itemMenuButton.setEnabled(false);
+                listItem.setEnabled(false);
+                itemClickListener.onItemChecked(getAdapterPosition());
+            } else {
+                itemMenuButton.setEnabled(true);
+                listItem.setEnabled(true);
+                itemClickListener.onItemUnchecked(getAdapterPosition());
             }
         }
 

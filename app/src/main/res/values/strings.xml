@@ -26,7 +26,11 @@
 
     <!-- Okno dialogowe przy usuwaniu pozycji z listy: -->
     <string name="delete_product_message">Czy usunąć produkt</string>
+    <string name="delete_product_extended_message">Spowoduje to usunięcie tego produktu ze wszystkich list zakupów.</string>
+    <string name="delete_multiple_products_message">Czy usunąć zaznaczone produkty</string>
+    <string name="delete_multiple_products_extended_message">Spowoduje to usunięcie tych produktów ze wszystkich list zakupów.</string>
     <string name="delete_list_message">Czy usunąć listę</string>
+    <string name="delete_multiple_lists_message">Czy usunąć zaznaczone listy</string>
     <string name="delete">Usuń</string>
     <string name="cancel_button">Anuluj</string>
     <string name="title_activity_main">MainActivity</string>
