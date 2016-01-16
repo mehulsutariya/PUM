@@ -79,6 +79,7 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
     @Override
     public void onStop() {
         super.onStop();
+        adapter.close();
         realm.close();
     }
 
@@ -181,21 +182,16 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
     protected abstract RealmResults<T> runRealmQuery();
 
     public void removeItem(final int position) {
-        realm.removeAllChangeListeners(); //obejście błędu biblioteki
         realm.beginTransaction();
         listItems.remove(position);
         realm.commitTransaction();
-        //powiadomienia adaptera o zmianach bo listener został usunięty:
-        adapter.notifyItemRemoved(position);
     }
 
     public void removeCheckedItems() {
-        realm.removeAllChangeListeners(); //obejście błędu biblioteki
         RealmResults<T> itemsToDelete = listItems.where().equalTo("checked", true).findAll();
         realm.beginTransaction();
         itemsToDelete.clear();
         realm.commitTransaction();
-        adapter.notifyDataSetChanged();
         if (actionMode != null) {
             actionMode.finish();
             actionMode = null;
@@ -235,13 +231,12 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
                 RealmResults<T> checkedItems = listItems.where().equalTo("checked", true).findAll();
                 if (checkedItems.size() > 0) {
                     realm.beginTransaction();
-                    for (int i = 0; i < checkedItems.size(); i++) {
+                    for (int i = checkedItems.size() - 1; i >=0; i--) {
                         checkedItems.get(i).setChecked(false);
                     }
                     realm.commitTransaction();
                     adapter.notifyDataSetChanged();
                 }
-                numberOfCheckedItems = 0;
             }
         };
     }

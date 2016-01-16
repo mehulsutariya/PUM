@@ -97,6 +97,7 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
     @Override
     public void onStop() {
         super.onStop();
+        shoppingListAdapter.close();
         realm.close();
     }
 
