@@ -150,11 +150,7 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
                         if (product == null) {
                             product = new Product();
                         }
-                        //Realm realm = Realm.getDefaultInstance();
-                        //realm.beginTransaction();
                         product.setName(s.toString().trim());
-                        //realm.commitTransaction();
-                        //realm.close();
                         item.setProduct(product);
                         break;
                     case PRICE:

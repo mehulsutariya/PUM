@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".gui.MarketMapEditorActivity">
 
     <LinearLayout
@@ -24,10 +25,14 @@
                 android:hint="@string/map_name" />
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView
             android:id="@+id/map_content_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:scrollbars="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:rrvLayoutType="LinearLayout" />
 
     </LinearLayout>
 

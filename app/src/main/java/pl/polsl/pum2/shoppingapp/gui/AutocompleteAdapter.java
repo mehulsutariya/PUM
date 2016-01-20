@@ -9,19 +9,21 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import io.realm.RealmObject;
 import io.realm.RealmResults;
+import pl.polsl.pum2.shoppingapp.database.CheckableRealmObjectWithName;
 import pl.polsl.pum2.shoppingapp.database.Product;
 
 
-public class AutocompleteAdapter extends FilterableRealmBaseAdapter<Product> {
+public class AutocompleteAdapter<T extends RealmObject & CheckableRealmObjectWithName> extends FilterableRealmBaseAdapter<T> {
 
-    public AutocompleteAdapter(Context context, RealmResults<Product> productRealmResults) {
-        super(context, android.R.layout.simple_list_item_1, productRealmResults);
+    public AutocompleteAdapter(Context context, RealmResults<T> realmResults) {
+        super(context, android.R.layout.simple_list_item_1, realmResults);
     }
 
 
     @Override
-    public List<Product> performRealmFiltering(@NonNull CharSequence constraint, RealmResults<Product> results) {
+    public List<T> performRealmFiltering(@NonNull CharSequence constraint, RealmResults<T> results) {
         return results.where().contains("name", constraint.toString()).findAll();
     }
 
