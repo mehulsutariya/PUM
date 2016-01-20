@@ -88,9 +88,14 @@ public class ListCreatorActivity extends AppCompatActivity {
 
     private void saveList() throws RealmPrimaryKeyConstraintException {
         realm.beginTransaction();
-        ShoppingList list = realm.createObject(ShoppingList.class);
-        list.setName(listName.getText().toString().trim());
-        realm.commitTransaction();
+        try {
+            ShoppingList list = realm.createObject(ShoppingList.class);
+            list.setName(listName.getText().toString().trim());
+            realm.commitTransaction();
+        } catch (RealmPrimaryKeyConstraintException primaryKeyException) {
+            realm.cancelTransaction();
+            throw primaryKeyException;
+        }
     }
 
     private void showExistingListMessageDialog() {
