@@ -20,6 +20,7 @@ import java.util.List;
 import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.Product;
+import pl.polsl.pum2.shoppingapp.database.ProductCategory;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
 
@@ -28,11 +29,13 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
     private List<ShoppingListItem> dataSource;
     private Context context;
     private RealmResults<Product> products;
+    private RealmResults<ProductCategory> productCategories;
 
-    ListEditorAdapter(Context context, List<ShoppingListItem> dataSource, RealmResults<Product> products) {
+    ListEditorAdapter(Context context, List<ShoppingListItem> dataSource, RealmResults<Product> products, RealmResults<ProductCategory> productCategories) {
         this.context = context;
         this.dataSource = dataSource;
         this.products = products;
+        this.productCategories = productCategories;
     }
 
     @Override
@@ -112,6 +115,9 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
                     productName.append(item.getName());
                 }
             });
+
+            RealmSpinnerAdapter<ProductCategory> spinnerAdapter = new RealmSpinnerAdapter<>(context, productCategories, true);
+            productCategory.setAdapter(spinnerAdapter);
         }
     }
 

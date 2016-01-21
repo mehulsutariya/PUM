@@ -7,10 +7,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -33,14 +36,6 @@ public class ProductCategoryDialogFragment extends DialogFragment {
         }
     }
 
-    /*
-    @Override
-    public void onStart() {
-        super.onStart();
-
-    }
-    */
-
     @Override
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -49,7 +44,7 @@ public class ProductCategoryDialogFragment extends DialogFragment {
         final View view = inflater.inflate(R.layout.dialog_product_category, null);
         realm = Realm.getDefaultInstance();
         RealmResults<ProductCategory> productCategories = realm.where(ProductCategory.class).findAll();
-        AutocompleteAdapter autocompleteAdapter = new AutocompleteAdapter(getContext(), productCategories);
+        AutocompleteAdapter<ProductCategory> autocompleteAdapter = new AutocompleteAdapter(getContext(), productCategories);
         final AutoCompleteTextView categoryName = (AutoCompleteTextView) view.findViewById(R.id.category_name_edit);
         categoryName.setAdapter(autocompleteAdapter);
         categoryName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -63,14 +58,44 @@ public class ProductCategoryDialogFragment extends DialogFragment {
                 categoryName.append(item.getName());
             }
         });
-
         builder.setView(view)
                 .setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        listener.onProductCategoryDialogOk(categoryName.getText().toString());
+                        listener.onProductCategoryDialogOk(categoryName.getText().toString().trim());
                     }
                 });
-        return builder.create();
+        final AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {                    //
+                final Button positiveButton = ((AlertDialog) dialog)
+                        .getButton(AlertDialog.BUTTON_POSITIVE);
+                positiveButton.setEnabled(false);
+                categoryName.addTextChangedListener(new TextWatcher() {
+
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (s.length() > 0) {
+                            positiveButton.setEnabled(true);
+                        } else {
+                            positiveButton.setEnabled(false);
+                        }
+                    }
+                });
+
+            }
+        });
+        return dialog;
     }
 
     @Override

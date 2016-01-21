@@ -2,6 +2,8 @@ package pl.polsl.pum2.shoppingapp.gui;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
@@ -25,19 +27,24 @@ public class MarketMapEditorActivity extends AppCompatActivity implements Produc
     private Realm realm;
     private BaseRecyclerViewRealmAdapter<ProductCategory> recyclerViewAdapter;
     private boolean doneButtonClicked;
+    private boolean isSavedInstance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_market_map_editor);
+        realm = Realm.getDefaultInstance();
         mapNameEditText = (EditText) findViewById(R.id.map_name);
+
         Bundle intentExtras = getIntent().getExtras();
         String mapName = "";
         if (intentExtras != null) {
             mapName = intentExtras.getString(MAP_NAME, "");
+        } else if (savedInstanceState != null) {
+            mapName = savedInstanceState.getString(MAP_NAME);
         }
-        realm = Realm.getDefaultInstance();
-        if (mapName.length() > 0) {
+
+        if (mapName.length() > 0 || savedInstanceState != null) {
             mapNameEditText.setText(mapName);
             map = realm.where(MarketMap.class).equalTo("name", mapName).findFirst();
             productCategories = map.getProductCategories().where().findAll();
@@ -53,13 +60,28 @@ public class MarketMapEditorActivity extends AppCompatActivity implements Produc
         mapContentRecyclerView.setAdapter(recyclerViewAdapter);
 
         doneButtonClicked = false;
+        isSavedInstance = false;
+    }
+
+    @Override
+    public void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+        isSavedInstance = true;
+        try {
+            realm.beginTransaction();
+            map.setName(mapNameEditText.getText().toString());
+            realm.commitTransaction();
+        } catch (RealmPrimaryKeyConstraintException e) {
+            realm.cancelTransaction();
+        }
+        outState.putString(MAP_NAME, mapNameEditText.getText().toString());
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         recyclerViewAdapter.close();
-        if (!doneButtonClicked) {
+        if (!doneButtonClicked && !isSavedInstance) {
             realm.beginTransaction();
             map.removeFromRealm();
             realm.commitTransaction();
@@ -105,10 +127,12 @@ public class MarketMapEditorActivity extends AppCompatActivity implements Produc
             realm.commitTransaction();
         } catch (RealmPrimaryKeyConstraintException e) {
             ProductCategory existingCategory = realm.where(ProductCategory.class).equalTo("name", categoryName).findFirst();
+            realm.cancelTransaction();
             if (productCategories.contains(existingCategory)) {
-                realm.cancelTransaction();
+
                 //TODO
             } else {
+                realm.beginTransaction();
                 productCategories.add(existingCategory);
                 realm.commitTransaction();
             }

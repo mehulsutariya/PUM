@@ -10,6 +10,7 @@ public class ShoppingList extends RealmObject implements CheckableRealmObjectWit
     @PrimaryKey
     private String name;
     private boolean checked;
+    private MarketMap marketMap;
 
     private RealmList<ShoppingListItem> items;
 
@@ -35,5 +36,13 @@ public class ShoppingList extends RealmObject implements CheckableRealmObjectWit
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public MarketMap getMarketMap() {
+        return marketMap;
+    }
+
+    public void setMarketMap(MarketMap marketMap) {
+        this.marketMap = marketMap;
     }
 }

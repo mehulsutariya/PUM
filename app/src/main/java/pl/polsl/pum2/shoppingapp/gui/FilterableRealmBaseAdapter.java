@@ -14,23 +14,25 @@ import io.realm.RealmResults;
 
 public abstract class FilterableRealmBaseAdapter<T extends RealmObject> extends ArrayAdapter<T> implements Filterable {
 
-    private final RealmResults<T> mRealmObjectList;
-    private List<T> mResults;
+    private final RealmResults<T> realmObjectList;
+    private List<T> results;
+    protected Context context;
 
     public FilterableRealmBaseAdapter(Context context, @LayoutRes int layout, RealmResults<T> realmObjectList) {
         super(context, layout);
-        mRealmObjectList = realmObjectList;
+        this.realmObjectList = realmObjectList;
+        this.context = context;
     }
 
     @Override
     public int getCount() {
-        return mResults == null ? 0 : mResults.size();
+        return results == null ? 0 : results.size();
     }
 
     @Override
     public T getItem(int position) {
-        mResults.get(position);
-        return mResults == null ? null : mResults.get(position);
+        results.get(position);
+        return results == null ? null : results.get(position);
     }
 
     @Override
@@ -52,8 +54,8 @@ public abstract class FilterableRealmBaseAdapter<T extends RealmObject> extends 
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 // back on the main thread, we can do the query and notify
                 if (constraint != null) {
-                    mResults = performRealmFiltering(constraint, mRealmObjectList);
-                    mHasResults = mResults.size() > 0;
+                    FilterableRealmBaseAdapter.this.results = performRealmFiltering(constraint, realmObjectList);
+                    mHasResults = FilterableRealmBaseAdapter.this.results.size() > 0;
                     notifyDataSetChanged();
                 }
             }

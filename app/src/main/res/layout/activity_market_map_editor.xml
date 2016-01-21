@@ -22,6 +22,8 @@
                 android:id="@+id/map_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
                 android:hint="@string/map_name" />
         </android.support.design.widget.TextInputLayout>
 

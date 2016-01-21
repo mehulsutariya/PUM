@@ -67,7 +67,7 @@
     <string name="valuesInvalid">Podane wartości są nieprawidłowe.</string>
     <string name="noProducts">Brak produktów</string>
     <string name="nameAlreadyExists">Podana nazwa już istnieje. Wpisz inną.</string>
-    <string name="category_name">Nazwa kategorii produktu</string>
+    <string name="category_name">Nazwa kategorii</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

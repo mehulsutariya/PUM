@@ -5,12 +5,16 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
+import pl.polsl.pum2.shoppingapp.database.MarketMap;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
 
 
@@ -19,11 +23,13 @@ public class ListCreatorActivity extends AppCompatActivity {
     private static final String MESSAGE_DIALOG_TAG = "pl.polsl.pum2.shoppingapp.gui.ListCreatorActivity.messageDialogTag";
     private EditText listName;
     private Realm realm;
+    private MarketMap selectedMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_creator);
+        realm = Realm.getDefaultInstance();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -76,7 +82,21 @@ public class ListCreatorActivity extends AppCompatActivity {
                 }
             }
         });
-        realm = Realm.getDefaultInstance();
+        Spinner marketMapSpinner = (Spinner) findViewById(R.id.maret_map_spinner);
+        RealmResults<MarketMap> marketMaps = realm.where(MarketMap.class).findAll();
+        RealmSpinnerAdapter<MarketMap> spinnerAdapter = new RealmSpinnerAdapter<>(this, marketMaps, true);
+        marketMapSpinner.setAdapter(spinnerAdapter);
+        marketMapSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedMap = (MarketMap) parent.getSelectedItem();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //TODO
+            }
+        });
     }
 
 
@@ -91,6 +111,7 @@ public class ListCreatorActivity extends AppCompatActivity {
         try {
             ShoppingList list = realm.createObject(ShoppingList.class);
             list.setName(listName.getText().toString().trim());
+            list.setMarketMap(selectedMap);
             realm.commitTransaction();
         } catch (RealmPrimaryKeyConstraintException primaryKeyException) {
             realm.cancelTransaction();
