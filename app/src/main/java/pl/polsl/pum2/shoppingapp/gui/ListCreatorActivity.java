@@ -24,6 +24,7 @@ public class ListCreatorActivity extends AppCompatActivity {
     private EditText listName;
     private Realm realm;
     private MarketMap selectedMap;
+    private Spinner marketMapSpinner;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,14 +39,14 @@ public class ListCreatorActivity extends AppCompatActivity {
         newMarketMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createOrEditMarketMap();
+                createOrEditMarketMap(false);
             }
         });
-        Button editMarketMapButton = (Button) findViewById(R.id.editMarketMapButton);
+        final Button editMarketMapButton = (Button) findViewById(R.id.editMarketMapButton);
         editMarketMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createOrEditMarketMap();
+                createOrEditMarketMap(true);
             }
         });
         Button doneButton = (Button) findViewById(R.id.done_button);
@@ -82,7 +83,7 @@ public class ListCreatorActivity extends AppCompatActivity {
                 }
             }
         });
-        Spinner marketMapSpinner = (Spinner) findViewById(R.id.maret_map_spinner);
+        marketMapSpinner = (Spinner) findViewById(R.id.maret_map_spinner);
         RealmResults<MarketMap> marketMaps = realm.where(MarketMap.class).findAll();
         RealmSpinnerAdapter<MarketMap> spinnerAdapter = new RealmSpinnerAdapter<>(this, marketMaps, true);
         marketMapSpinner.setAdapter(spinnerAdapter);
@@ -90,13 +91,17 @@ public class ListCreatorActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedMap = (MarketMap) parent.getSelectedItem();
+                editMarketMapButton.setEnabled(true);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                //TODO
+
             }
         });
+        if (marketMapSpinner.getSelectedItem() == null) {
+            editMarketMapButton.setEnabled(false);
+        }
     }
 
 
@@ -124,8 +129,11 @@ public class ListCreatorActivity extends AppCompatActivity {
         dialogFragment.show(getSupportFragmentManager(), "listExistsMessage");
     }
 
-    private void createOrEditMarketMap() {
+    private void createOrEditMarketMap(boolean editMode) {
         Intent intent = new Intent(this, MarketMapEditorActivity.class);
+        if (editMode) {
+            intent.putExtra(MarketMapEditorActivity.MAP_NAME, ((MarketMap) marketMapSpinner.getSelectedItem()).getName());
+        }
         startActivity(intent);
     }
 
@@ -135,8 +143,7 @@ public class ListCreatorActivity extends AppCompatActivity {
     }
 
     boolean formIsCompleted() {
-        //TODO: sprawdzanie stanu spinnera
-        return listName.length() != 0;
+        return listName.length() != 0 && marketMapSpinner.getSelectedItem() != null;
     }
 
     @Override

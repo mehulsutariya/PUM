@@ -22,11 +22,13 @@ import java.text.NumberFormat;
 
 import io.realm.Realm;
 import io.realm.RealmBasedRecyclerViewAdapter;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
 import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.Product;
+import pl.polsl.pum2.shoppingapp.database.ProductCategory;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
 
@@ -34,16 +36,21 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
 
     public static int EDIT_SUCCEEDED = 0;
     public static int EDIT_FAILED = 1;
-    OnItemClickListener itemClickListener;
+    private OnItemClickListener itemClickListener;
+    private RealmList<ProductCategory> productCategories;
+    private RealmSpinnerAdapter<ProductCategory> spinnerAdapter;
     private Context context;
     private int listType;
     private Realm realm;
 
-    public ShoppingListAdapter(Context context, Realm realm, RealmResults<ShoppingListItem> realmResults, boolean automaticUpdate, boolean animateIdType, int listType) {
+    public ShoppingListAdapter(Context context, Realm realm, RealmResults<ShoppingListItem> realmResults, RealmList<ProductCategory> productCategories, boolean automaticUpdate, boolean animateIdType, int listType) {
         super(context, realmResults, automaticUpdate, animateIdType);
         this.context = context;
         this.realm = realm;
         this.listType = listType;
+        this.productCategories = productCategories;
+        RealmResults<ProductCategory> categories = productCategories.where().findAll();
+        spinnerAdapter = new RealmSpinnerAdapter<>(context, categories, true);
     }
 
     @Override
@@ -82,6 +89,7 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
         }
         holder.quantity.setText(String.format(context.getString(R.string.quantity_string), numberFormat.format(quantity)));
         holder.quantityEdit.setText(quantity.toString());
+        holder.productCategory.setSelection(realmResults.get(position).getCategoryIndex());
     }
 
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
@@ -169,6 +177,7 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
                     productNameEdit.append(item.getName());
                 }
             });
+            productCategory.setAdapter(spinnerAdapter);
         }
 
         @Override
@@ -251,9 +260,12 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
                     Product existingProduct = realm.where(Product.class).equalTo("name", productNameEdit.getText().toString().trim()).findFirst();
                     item.setProduct(existingProduct);
                 }
-                Double price = Double.parseDouble(priceEdit.getText().toString());
-                item.setPrice(price);
+                if (priceEdit.length() > 0) {
+                    Double price = Double.parseDouble(priceEdit.getText().toString());
+                    item.setPrice(price);
+                }
                 item.setQuantity(Double.parseDouble(quantityEdit.getText().toString()));
+                item.setCategoryIndex(productCategory.getSelectedItemPosition());
                 realm.commitTransaction();
                 notifyItemChanged(position);
             } else {
@@ -266,6 +278,7 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
             productNameEdit.setText(item.getProduct().getName());
             priceEdit.setText(Double.toString(item.getPrice()));
             quantityEdit.setText(Double.toString(item.getQuantity()));
+            productCategory.setSelection(item.getCategoryIndex());
         }
 
         private boolean editedValuesAreValid() {

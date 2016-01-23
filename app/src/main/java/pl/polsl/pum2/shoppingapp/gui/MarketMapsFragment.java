@@ -25,14 +25,14 @@ public class MarketMapsFragment extends BaseRealmRecyclerViewFragment<MarketMap>
     protected void onRecyclerViewItemDelete(int position) {
         positionOfItemToDelete = position;
         isRemovingCheckedItems = false;
-        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_product_message), getString(R.string.delete_product_extended_message), getListItems().get(position).getName(), this);
+        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_map_message), getString(R.string.delete_map_extended_message), getListItems().get(position).getName(), this);
         deleteItemDialogFragment.show(getActivity().getSupportFragmentManager(), "deleteItemDialogTag");
     }
 
     @Override
     protected void onRecyclerViewCheckedItemsDelete() {
         isRemovingCheckedItems = true;
-        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_multiple_products_message), getString(R.string.delete_multiple_products_extended_message), null, this);
+        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_multiple_maps_message), getString(R.string.delete_multiple_maps_extended_message), null, this);
         deleteItemDialogFragment.show(getActivity().getSupportFragmentManager(), "deleteItemDialogTag");
     }
 

@@ -9,16 +9,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 
 import java.text.NumberFormat;
 
 import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
+import pl.polsl.pum2.shoppingapp.database.ProductCategory;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
+import pl.polsl.pum2.shoppingapp.helpers.KeyboardHelper;
 
 public class ShoppingListFragment extends Fragment implements DeleteItemDialogFragment.DeleteItemDialogListener {
 
@@ -37,6 +39,7 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
     private Realm realm;
 
     private RealmResults<ShoppingListItem> listItems;
+    private RealmList<ProductCategory> productCategories;
 
     public ShoppingListFragment() {
         // Required empty public constructor
@@ -83,11 +86,18 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
         super.onStart();
         realm = Realm.getDefaultInstance();
         ShoppingList shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
+        productCategories = shoppingList.getMarketMap().getProductCategories();
+
+        realm.beginTransaction();
+        for (ShoppingListItem item : shoppingList.getItems()) {
+            item.setCategoryIndex(productCategories.indexOf(item.getCategory()));
+        }
+        realm.commitTransaction();
 
         if (listType == SHOPPING_LIST) {
-            listItems = shoppingList.getItems().where().equalTo("isBought", false).isNotNull("product").findAll();
+            listItems = shoppingList.getItems().where().equalTo("isBought", false).isNotNull("product").findAllSorted("categoryIndex");
         } else {
-            listItems = shoppingList.getItems().where().equalTo("isBought", true).isNotNull("product").findAll();
+            listItems = shoppingList.getItems().where().equalTo("isBought", true).isNotNull("product").findAllSorted("categoryIndex");
         }
         updatePriceSum();
 
@@ -108,7 +118,7 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
     }
 
     private void setRecyclerViewAdapter() {
-        shoppingListAdapter = new ShoppingListAdapter(getContext(), realm, listItems, true, true, listType);
+        shoppingListAdapter = new ShoppingListAdapter(getContext(), realm, listItems, productCategories, true, true, listType);
         shoppingListAdapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
 
             @Override
@@ -170,18 +180,10 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
     }
 
     private void exitEditMode() {
-        hideSoftKeyboard();
+        KeyboardHelper.hideSoftKeyboard(getActivity());
         numberOfPositionsInEditMode--;
         if (numberOfPositionsInEditMode == 0) {
             listener.onExitEditMode();
-        }
-    }
-
-    private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-
-        if (imm.isActive()) {
-            imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
         }
     }
 

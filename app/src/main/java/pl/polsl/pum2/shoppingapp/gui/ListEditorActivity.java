@@ -75,7 +75,7 @@ public class ListEditorActivity extends AppCompatActivity {
         recyclerViewLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
 
-        listAdapter = new ListEditorAdapter(this, listItems, products, productCategories);
+        listAdapter = new ListEditorAdapter(this, listItems, products, productCategories, shoppingList.getMarketMap().getName());
         recyclerView.setAdapter(listAdapter);
         if (listItems.size() == 0) {
             insertNewItem();
@@ -151,7 +151,6 @@ public class ListEditorActivity extends AppCompatActivity {
                 items.add(item);
                 realm.commitTransaction();
             }
-
         }
     }
 

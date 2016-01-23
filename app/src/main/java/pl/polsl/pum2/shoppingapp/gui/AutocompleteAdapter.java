@@ -31,8 +31,8 @@ public class AutocompleteAdapter<T extends RealmObject & CheckableRealmObjectWit
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
-        if( convertView == null ){
-            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.drop_down_list_layout, null);
         } else {
             view = convertView;

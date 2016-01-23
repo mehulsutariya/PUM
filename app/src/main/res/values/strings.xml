@@ -31,13 +31,21 @@
     <string name="delete_multiple_products_extended_message">Spowoduje to usunięcie tych produktów ze wszystkich list zakupów.</string>
     <string name="delete_list_message">Czy usunąć listę</string>
     <string name="delete_multiple_lists_message">Czy usunąć zaznaczone listy</string>
+    <string name="delete_category_message">Czy usunąć kategorię</string>
+    <string name="delete_category_extended_message">Spowoduje to usunięcie tej kategorii ze wszystkich list zakupów.</string>
+    <string name="delete_multiple_categories_message">Czy usunąć zaznaczone kategorie</string>
+    <string name="delete_multiple_categories_extended_message">Spowoduje to usunięcie tych kategorii ze wszystkich list zakupów.</string>
+    <string name="delete_map_message">Czy usunąć mapę</string>
+    <string name="delete_map_extended_message">Spowoduje to usunięcie tej mapy ze wszystkich list zakupów.</string>
+    <string name="delete_multiple_maps_message">Czy usunąć zaznaczone mapy sklepów</string>
+    <string name="delete_multiple_maps_extended_message">Spowoduje to usunięcie tych map ze wszystkich list zakupów.</string>
     <string name="delete">Usuń</string>
     <string name="cancel_button">Anuluj</string>
-    <string name="title_activity_main">MainActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <!-- Menu navigation drawer -->
     <string name="shopping_lists">Listy zakupów</string>
     <string name="products">Produkty</string>
     <string name="categories">Kategorie produktów</string>
@@ -68,7 +76,6 @@
     <string name="noProducts">Brak produktów</string>
     <string name="nameAlreadyExists">Podana nazwa już istnieje. Wpisz inną.</string>
     <string name="category_name">Nazwa kategorii</string>
+    <string name="no_category">Brak kategorii</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

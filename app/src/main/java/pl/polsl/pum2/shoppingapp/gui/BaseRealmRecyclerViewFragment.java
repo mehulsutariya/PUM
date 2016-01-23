@@ -96,7 +96,7 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
     }
 
     private void setRecyclerViewAdapter() {
-        adapter = new BaseRecyclerViewRealmAdapter<>(getContext(), listItems, true, true);
+        adapter = new BaseRecyclerViewRealmAdapter<>(getContext(), getActivity(), listItems, true, true);
         productsRecyclerView.setAdapter(adapter);
         adapter.setOnItemClickListener(new BaseRecyclerViewRealmAdapter.OnItemClickListener() {
             @Override
@@ -203,7 +203,6 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                // Inflate a menu resource providing context menu items
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_contextual_action_mode, menu);
                 return true;
@@ -211,7 +210,7 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false; // Return false if nothing is done
+                return false;
             }
 
             @Override
@@ -231,7 +230,7 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
                 RealmResults<T> checkedItems = listItems.where().equalTo("checked", true).findAll();
                 if (checkedItems.size() > 0) {
                     realm.beginTransaction();
-                    for (int i = checkedItems.size() - 1; i >=0; i--) {
+                    for (int i = checkedItems.size() - 1; i >= 0; i--) {
                         checkedItems.get(i).setChecked(false);
                     }
                     realm.commitTransaction();

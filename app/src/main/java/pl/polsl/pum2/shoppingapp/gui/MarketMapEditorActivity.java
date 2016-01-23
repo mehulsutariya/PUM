@@ -2,10 +2,10 @@ package pl.polsl.pum2.shoppingapp.gui;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+
+import java.util.List;
 
 import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
 import io.realm.Realm;
@@ -28,6 +28,8 @@ public class MarketMapEditorActivity extends AppCompatActivity implements Produc
     private BaseRecyclerViewRealmAdapter<ProductCategory> recyclerViewAdapter;
     private boolean doneButtonClicked;
     private boolean isSavedInstance;
+    private boolean isEditMode;
+    private List<ProductCategory> oldProductCategories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +40,14 @@ public class MarketMapEditorActivity extends AppCompatActivity implements Produc
 
         Bundle intentExtras = getIntent().getExtras();
         String mapName = "";
+        isEditMode = false;
+        isSavedInstance = false;
         if (intentExtras != null) {
             mapName = intentExtras.getString(MAP_NAME, "");
+            isEditMode = true;
         } else if (savedInstanceState != null) {
             mapName = savedInstanceState.getString(MAP_NAME);
+            isSavedInstance = true;
         }
 
         if (mapName.length() > 0 || savedInstanceState != null) {
@@ -54,19 +60,20 @@ public class MarketMapEditorActivity extends AppCompatActivity implements Produc
             realm.commitTransaction();
             productCategories = map.getProductCategories().where().findAll();
         }
-        recyclerViewAdapter = new BaseRecyclerViewRealmAdapter<>(this, productCategories, true, true);
+        if (isEditMode) {
+            oldProductCategories = realm.copyFromRealm(map.getProductCategories());
+        }
+        recyclerViewAdapter = new BaseRecyclerViewRealmAdapter<>(this, this, productCategories, true, true);
 
         mapContentRecyclerView = (RealmRecyclerView) findViewById(R.id.map_content_recycler_view);
         mapContentRecyclerView.setAdapter(recyclerViewAdapter);
 
         doneButtonClicked = false;
-        isSavedInstance = false;
     }
 
     @Override
-    public void onSaveInstanceState (Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        isSavedInstance = true;
         try {
             realm.beginTransaction();
             map.setName(mapNameEditText.getText().toString());
@@ -74,6 +81,7 @@ public class MarketMapEditorActivity extends AppCompatActivity implements Produc
         } catch (RealmPrimaryKeyConstraintException e) {
             realm.cancelTransaction();
         }
+        isSavedInstance = true;
         outState.putString(MAP_NAME, mapNameEditText.getText().toString());
     }
 
@@ -82,9 +90,18 @@ public class MarketMapEditorActivity extends AppCompatActivity implements Produc
         super.onDestroy();
         recyclerViewAdapter.close();
         if (!doneButtonClicked && !isSavedInstance) {
-            realm.beginTransaction();
-            map.removeFromRealm();
-            realm.commitTransaction();
+            if (isEditMode) {
+                realm.beginTransaction();
+                RealmList<ProductCategory> categoriesCopy = new RealmList<>();
+                categoriesCopy.addAll(realm.copyToRealmOrUpdate(oldProductCategories));
+                map.getProductCategories().clear();
+                map.setProductCategories(categoriesCopy);
+                realm.commitTransaction();
+            } else {
+                realm.beginTransaction();
+                map.removeFromRealm();
+                realm.commitTransaction();
+            }
         }
         realm.close();
     }

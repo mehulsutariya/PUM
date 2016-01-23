@@ -6,6 +6,8 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.ProductCategory;
+import pl.polsl.pum2.shoppingapp.database.ShoppingList;
+import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
 
 public class ProductCategoriesFragment extends BaseRealmRecyclerViewFragment<ProductCategory> implements DeleteItemDialogFragment.DeleteItemDialogListener {
 
@@ -25,14 +27,14 @@ public class ProductCategoriesFragment extends BaseRealmRecyclerViewFragment<Pro
     protected void onRecyclerViewItemDelete(int position) {
         positionOfItemToDelete = position;
         isRemovingCheckedItems = false;
-        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_product_message), getString(R.string.delete_product_extended_message), getListItems().get(position).getName(), this);
+        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_category_message), getString(R.string.delete_category_extended_message), getListItems().get(position).getName(), this);
         deleteItemDialogFragment.show(getActivity().getSupportFragmentManager(), "deleteItemDialogTag");
     }
 
     @Override
     protected void onRecyclerViewCheckedItemsDelete() {
         isRemovingCheckedItems = true;
-        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_multiple_products_message), getString(R.string.delete_multiple_products_extended_message), null, this);
+        DialogFragment deleteItemDialogFragment = DeleteItemDialogFragment.newInstance(getString(R.string.delete_multiple_categories_message), getString(R.string.delete_multiple_categories_extended_message), null, this);
         deleteItemDialogFragment.show(getActivity().getSupportFragmentManager(), "deleteItemDialogTag");
     }
 
@@ -48,6 +50,16 @@ public class ProductCategoriesFragment extends BaseRealmRecyclerViewFragment<Pro
     @Override
     public void onDeleteItemDialogCancel() {
 
+    }
+
+    @Override
+    public void removeCheckedItems() {
+        //TODO
+    }
+
+    @Override
+    public void removeItem(int position) {
+        //TODO
     }
 
 }

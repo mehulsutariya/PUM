@@ -8,7 +8,6 @@ import io.realm.annotations.RealmClass;
 public class Product extends RealmObject implements CheckableRealmObjectWithName {
     @PrimaryKey
     private String name;
-    private ProductCategory category;
     private boolean checked;
 
     public boolean isChecked() {
@@ -25,14 +24,6 @@ public class Product extends RealmObject implements CheckableRealmObjectWithName
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public ProductCategory getCategory() {
-        return category;
-    }
-
-    public void setCategory(ProductCategory category) {
-        this.category = category;
     }
 
 }

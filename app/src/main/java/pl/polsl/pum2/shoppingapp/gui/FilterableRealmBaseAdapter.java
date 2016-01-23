@@ -15,8 +15,8 @@ import io.realm.RealmResults;
 public abstract class FilterableRealmBaseAdapter<T extends RealmObject> extends ArrayAdapter<T> implements Filterable {
 
     private final RealmResults<T> realmObjectList;
-    private List<T> results;
     protected Context context;
+    private List<T> results;
 
     public FilterableRealmBaseAdapter(Context context, @LayoutRes int layout, RealmResults<T> realmObjectList) {
         super(context, layout);

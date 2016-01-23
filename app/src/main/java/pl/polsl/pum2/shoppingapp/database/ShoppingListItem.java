@@ -1,6 +1,7 @@
 package pl.polsl.pum2.shoppingapp.database;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.RealmClass;
 
@@ -12,6 +13,8 @@ public class ShoppingListItem extends RealmObject {
     private double quantity;
     private double price;
     private boolean isBought;
+    private ProductCategory category;
+    private int categoryIndex;
 
     public ShoppingListItem() {
         timestamp = System.currentTimeMillis();
@@ -58,6 +61,22 @@ public class ShoppingListItem extends RealmObject {
 
     public void setBought(boolean isBought) {
         this.isBought = isBought;
+    }
+
+    public ProductCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ProductCategory category) {
+        this.category = category;
+    }
+
+    public int getCategoryIndex() {
+        return categoryIndex;
+    }
+
+    public void setCategoryIndex(int categoryIndex) {
+        this.categoryIndex = categoryIndex;
     }
 }
 

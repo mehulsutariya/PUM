@@ -1,6 +1,7 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,12 +31,14 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
     private Context context;
     private RealmResults<Product> products;
     private RealmResults<ProductCategory> productCategories;
+    private String marketMapName;
 
-    ListEditorAdapter(Context context, List<ShoppingListItem> dataSource, RealmResults<Product> products, RealmResults<ProductCategory> productCategories) {
+    ListEditorAdapter(Context context, List<ShoppingListItem> dataSource, RealmResults<Product> products, RealmResults<ProductCategory> productCategories, String marketMapName) {
         this.context = context;
         this.dataSource = dataSource;
         this.products = products;
         this.productCategories = productCategories;
+        this.marketMapName = marketMapName;
     }
 
     @Override
@@ -83,6 +86,7 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
         EditText price;
         EditText quantity;
         ImageButton deleteItemButton;
+        ImageButton addCategoryButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -91,6 +95,7 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
             price = (EditText) itemView.findViewById(R.id.price);
             quantity = (EditText) itemView.findViewById(R.id.quantity);
             deleteItemButton = (ImageButton) itemView.findViewById(R.id.delete_item_button);
+            addCategoryButton = (ImageButton) itemView.findViewById(R.id.add_category_button);
             deleteItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -118,6 +123,25 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
 
             RealmSpinnerAdapter<ProductCategory> spinnerAdapter = new RealmSpinnerAdapter<>(context, productCategories, true);
             productCategory.setAdapter(spinnerAdapter);
+            productCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    dataSource.get(getAdapterPosition()).setCategory((ProductCategory)parent.getAdapter().getItem(position));
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            addCategoryButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, MarketMapEditorActivity.class);
+                    intent.putExtra(MarketMapEditorActivity.MAP_NAME, marketMapName);
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 

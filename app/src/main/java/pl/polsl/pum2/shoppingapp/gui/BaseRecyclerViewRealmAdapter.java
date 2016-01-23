@@ -1,5 +1,6 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -24,16 +25,19 @@ import io.realm.RealmViewHolder;
 import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.CheckableRealmObjectWithName;
+import pl.polsl.pum2.shoppingapp.helpers.KeyboardHelper;
 
 
 public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealmObjectWithName> extends RealmBasedRecyclerViewAdapter<T, BaseRecyclerViewRealmAdapter<T>.ViewHolder> {
 
     Context context;
+    Activity activity;
     OnItemClickListener itemClickListener;
 
-    BaseRecyclerViewRealmAdapter(Context context, RealmResults<T> realmResults, boolean automaticUpdate, boolean animateIdType) {
+    BaseRecyclerViewRealmAdapter(Context context, Activity activity, RealmResults<T> realmResults, boolean automaticUpdate, boolean animateIdType) {
         super(context, realmResults, automaticUpdate, animateIdType);
         this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -153,6 +157,7 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealm
             viewFlipper.showPrevious();
             listItem.setOnClickListener(this);
             listItem.setOnLongClickListener(this);
+            KeyboardHelper.hideSoftKeyboard(activity);
         }
 
         private void insertEditedItemData(int position) {
