@@ -77,5 +77,6 @@
     <string name="nameAlreadyExists">Podana nazwa już istnieje. Wpisz inną.</string>
     <string name="category_name">Nazwa kategorii</string>
     <string name="no_category">Brak kategorii</string>
+    <string name="set_category_button">Ustaw kategorię</string>
 
 </resources>

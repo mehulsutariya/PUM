@@ -94,6 +94,9 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
         if (productCategories != null) {
             if (realmResults.get(position).getCategory() != null) {
                 holder.productCategory.setSelection(realmResults.get(position).getCategoryIndex());
+            } else {
+                holder.productCategory.setVisibility(View.GONE);
+                holder.setCategoryButton.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -137,6 +140,7 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
         OnItemClickListener itemClickListener;
         TextView quantity;
         EditText quantityEdit;
+        Button setCategoryButton;
 
         public ViewHolder(View itemView, OnItemClickListener itemClickListener) {
             super(itemView);
@@ -157,6 +161,7 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
             clearPriceButton = (ImageButton) itemView.findViewById(R.id.clear_price);
             clearQuantityButton = (ImageButton) itemView.findViewById(R.id.clear_quantity);
             productCategory = (Spinner) itemView.findViewById(R.id.product_category);
+            setCategoryButton = (Button) itemView.findViewById(R.id.set_category_button);
 
             viewFlipper.setMeasureAllChildren(false);
 
@@ -188,7 +193,13 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
             } else {
                 productCategory.setVisibility(View.GONE);
             }
-
+            setCategoryButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setCategoryButton.setVisibility(View.GONE);
+                    productCategory.setVisibility(View.VISIBLE);
+                }
+            });
         }
 
         @Override
@@ -294,7 +305,12 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
                 priceEdit.setText("");
             }
             quantityEdit.setText(Double.toString(item.getQuantity()));
-            productCategory.setSelection(item.getCategoryIndex());
+            if (item.getCategory() != null) {
+                productCategory.setSelection(item.getCategoryIndex());
+            } else {
+                setCategoryButton.setVisibility(View.VISIBLE);
+                productCategory.setVisibility(View.GONE);
+            }
         }
 
         private boolean editedValuesAreValid() {
