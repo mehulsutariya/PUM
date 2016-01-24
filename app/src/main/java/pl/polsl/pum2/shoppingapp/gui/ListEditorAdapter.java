@@ -126,7 +126,7 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
             productCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    dataSource.get(getAdapterPosition()).setCategory((ProductCategory)parent.getAdapter().getItem(position));
+                    dataSource.get(getAdapterPosition()).setCategory((ProductCategory) parent.getAdapter().getItem(position));
                 }
 
                 @Override

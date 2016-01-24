@@ -2,12 +2,10 @@ package pl.polsl.pum2.shoppingapp.gui;
 
 import android.support.v4.app.DialogFragment;
 
-import io.realm.Realm;
 import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
 import pl.polsl.pum2.shoppingapp.database.ProductCategory;
-import pl.polsl.pum2.shoppingapp.database.ShoppingList;
-import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
+
 
 public class ProductCategoriesFragment extends BaseRealmRecyclerViewFragment<ProductCategory> implements DeleteItemDialogFragment.DeleteItemDialogListener {
 
@@ -50,16 +48,6 @@ public class ProductCategoriesFragment extends BaseRealmRecyclerViewFragment<Pro
     @Override
     public void onDeleteItemDialogCancel() {
 
-    }
-
-    @Override
-    public void removeCheckedItems() {
-        //TODO
-    }
-
-    @Override
-    public void removeItem(int position) {
-        //TODO
     }
 
 }

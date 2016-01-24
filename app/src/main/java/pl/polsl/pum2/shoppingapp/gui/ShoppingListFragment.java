@@ -1,6 +1,5 @@
 package pl.polsl.pum2.shoppingapp.gui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +16,7 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import pl.polsl.pum2.shoppingapp.R;
+import pl.polsl.pum2.shoppingapp.database.MarketMap;
 import pl.polsl.pum2.shoppingapp.database.ProductCategory;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
 import pl.polsl.pum2.shoppingapp.database.ShoppingListItem;
@@ -34,7 +34,6 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
     private ShoppingListAdapter shoppingListAdapter;
     private int positionOfItemToDelete;
     private int numberOfPositionsInEditMode;
-    private Activity activity;
     private int listType;
     private Realm realm;
 
@@ -68,7 +67,6 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = getActivity();
         listName = getArguments().getString(LIST_NAME);
         listType = getArguments().getInt(LIST_TYPE);
 
@@ -86,19 +84,33 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
         super.onStart();
         realm = Realm.getDefaultInstance();
         ShoppingList shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
-        productCategories = shoppingList.getMarketMap().getProductCategories();
-
-        realm.beginTransaction();
-        for (ShoppingListItem item : shoppingList.getItems()) {
-            item.setCategoryIndex(productCategories.indexOf(item.getCategory()));
-        }
-        realm.commitTransaction();
-
-        if (listType == SHOPPING_LIST) {
-            listItems = shoppingList.getItems().where().equalTo("isBought", false).isNotNull("product").findAllSorted("categoryIndex");
+        MarketMap map = shoppingList.getMarketMap();
+        if (map != null) {
+            productCategories = map.getProductCategories();
+            realm.beginTransaction();
+            for (ShoppingListItem item : shoppingList.getItems()) {
+                ProductCategory category = item.getCategory();
+                if (category != null) {
+                    item.setCategoryIndex(productCategories.indexOf(item.getCategory()));
+                } else {
+                    item.setCategoryIndex(-1);
+                }
+            }
+            realm.commitTransaction();
+            if (listType == SHOPPING_LIST) {
+                listItems = shoppingList.getItems().where().equalTo("isBought", false).isNotNull("product").findAllSorted("categoryIndex");
+            } else {
+                listItems = shoppingList.getItems().where().equalTo("isBought", true).isNotNull("product").findAllSorted("categoryIndex");
+            }
         } else {
-            listItems = shoppingList.getItems().where().equalTo("isBought", true).isNotNull("product").findAllSorted("categoryIndex");
+            if (listType == SHOPPING_LIST) {
+                listItems = shoppingList.getItems().where().equalTo("isBought", false).isNotNull("product").findAll();
+            } else {
+                listItems = shoppingList.getItems().where().equalTo("isBought", true).isNotNull("product").findAll();
+            }
         }
+
+
         updatePriceSum();
 
         setRecyclerViewAdapter();

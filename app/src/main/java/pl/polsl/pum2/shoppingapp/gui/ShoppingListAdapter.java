@@ -49,8 +49,10 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
         this.realm = realm;
         this.listType = listType;
         this.productCategories = productCategories;
-        RealmResults<ProductCategory> categories = productCategories.where().findAll();
-        spinnerAdapter = new RealmSpinnerAdapter<>(context, categories, true);
+        if (productCategories != null) {
+            RealmResults<ProductCategory> categories = productCategories.where().findAll();
+            spinnerAdapter = new RealmSpinnerAdapter<>(context, categories, true);
+        }
     }
 
     @Override
@@ -89,7 +91,11 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
         }
         holder.quantity.setText(String.format(context.getString(R.string.quantity_string), numberFormat.format(quantity)));
         holder.quantityEdit.setText(quantity.toString());
-        holder.productCategory.setSelection(realmResults.get(position).getCategoryIndex());
+        if (productCategories != null) {
+            if (realmResults.get(position).getCategory() != null) {
+                holder.productCategory.setSelection(realmResults.get(position).getCategoryIndex());
+            }
+        }
     }
 
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
@@ -177,7 +183,12 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
                     productNameEdit.append(item.getName());
                 }
             });
-            productCategory.setAdapter(spinnerAdapter);
+            if (productCategories != null) {
+                productCategory.setAdapter(spinnerAdapter);
+            } else {
+                productCategory.setVisibility(View.GONE);
+            }
+
         }
 
         @Override
@@ -266,6 +277,7 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
                 }
                 item.setQuantity(Double.parseDouble(quantityEdit.getText().toString()));
                 item.setCategoryIndex(productCategory.getSelectedItemPosition());
+                item.setCategory((ProductCategory) productCategory.getSelectedItem());
                 realm.commitTransaction();
                 notifyItemChanged(position);
             } else {
@@ -276,7 +288,11 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
         private void cancelEditChanges(int position) {
             ShoppingListItem item = realmResults.get(position);
             productNameEdit.setText(item.getProduct().getName());
-            priceEdit.setText(Double.toString(item.getPrice()));
+            if (item.getPrice() > 0) {
+                priceEdit.setText(Double.toString(item.getPrice()));
+            } else {
+                priceEdit.setText("");
+            }
             quantityEdit.setText(Double.toString(item.getQuantity()));
             productCategory.setSelection(item.getCategoryIndex());
         }

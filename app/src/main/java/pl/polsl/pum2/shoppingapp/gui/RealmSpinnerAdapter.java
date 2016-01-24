@@ -27,12 +27,9 @@ public class RealmSpinnerAdapter<T extends RealmObject & CheckableRealmObjectWit
             spinnerView = convertView;
         }
         TextView itemName = (TextView) spinnerView.findViewById(R.id.item_name);
-        if (position > - 1) {
-            T item = getItem(position);
-            itemName.setText(item.getName());
-        } else {
-            itemName.setText(context.getString(R.string.no_category));
-        }
+
+        T item = getItem(position);
+        itemName.setText(item.getName());
         return spinnerView;
     }
 }
