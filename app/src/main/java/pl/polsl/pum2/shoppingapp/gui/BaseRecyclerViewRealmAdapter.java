@@ -68,13 +68,15 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealm
     public interface OnItemClickListener {
         void onListItemClick(int position);
 
-        boolean onListItemLongClick(int position);
+        boolean onItemLongClick(int position);
 
-        void onDelete(int position);
+        void onItemDelete(int position);
 
-        void onItemEdit();
+        void onItemEditStart();
 
         void onItemEditFailed(int position);
+
+        void onItemEditDone();
 
         void onItemChecked(int position);
 
@@ -145,11 +147,15 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealm
             if (isChecked) {
                 itemMenuButton.setEnabled(false);
                 listItem.setEnabled(false);
-                itemClickListener.onItemChecked(getAdapterPosition());
+                if (itemClickListener != null) {
+                    itemClickListener.onItemChecked(getAdapterPosition());
+                }
             } else {
                 itemMenuButton.setEnabled(true);
                 listItem.setEnabled(true);
-                itemClickListener.onItemUnchecked(getAdapterPosition());
+                if (itemClickListener != null) {
+                    itemClickListener.onItemUnchecked(getAdapterPosition());
+                }
             }
         }
 
@@ -158,11 +164,12 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealm
             listItem.setOnClickListener(this);
             listItem.setOnLongClickListener(this);
             KeyboardHelper.hideSoftKeyboard(activity);
+            itemClickListener.onItemEditDone();
         }
 
         private void insertEditedItemData(int position) {
             if (editedValuesAreValid()) {
-                T item = realmResults.get(getAdapterPosition());
+                T item = realmResults.get(position);
                 Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
                 try {
@@ -192,7 +199,7 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealm
         public boolean onLongClick(View view) {
             view.setSelected(true);
             if (itemClickListener != null) {
-                return itemClickListener.onListItemLongClick(getAdapterPosition());
+                return itemClickListener.onItemLongClick(getAdapterPosition());
             }
             return false;
         }
@@ -201,7 +208,7 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealm
         private void showPopupMenu(View v) {
             PopupMenu popup = new PopupMenu(context, v);
             MenuInflater inflater = popup.getMenuInflater();
-            inflater.inflate(R.menu.menu_shopping_list_item, popup.getMenu());
+            inflater.inflate(R.menu.menu_recycler_view_item, popup.getMenu());
             popup.setOnMenuItemClickListener(this);
             popup.show();
         }
@@ -214,7 +221,7 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealm
                     break;
                 case R.id.delete:
                     if (itemClickListener != null) {
-                        itemClickListener.onDelete(getAdapterPosition());
+                        itemClickListener.onItemDelete(getAdapterPosition());
                     }
                     break;
             }
@@ -225,7 +232,9 @@ public class BaseRecyclerViewRealmAdapter<T extends RealmObject & CheckableRealm
             viewFlipper.showNext();
             listItem.setOnClickListener(null);
             listItem.setOnLongClickListener(null);
-            itemClickListener.onItemEdit();
+            if (itemClickListener != null) {
+                itemClickListener.onItemEditStart();
+            }
         }
     }
 }

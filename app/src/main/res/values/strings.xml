@@ -78,5 +78,8 @@
     <string name="category_name">Nazwa kategorii</string>
     <string name="no_category">Brak kategorii</string>
     <string name="set_category_button">Ustaw kategorię</string>
+    <string name="no_map_check_box">Nie dołączaj mapy</string>
+    <string name="category_already_on_list">Kategoria już znajduje się na liście</string>
+    <string name="category_already_exists">Kategoria już istnieje</string>
 
 </resources>

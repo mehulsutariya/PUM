@@ -18,7 +18,7 @@ public class MarketMapsFragment extends BaseRealmRecyclerViewFragment<MarketMap>
 
     @Override
     protected RealmResults<MarketMap> runRealmQuery() {
-        return getRealmInstance().where(MarketMap.class).findAllSorted("name");
+        return getRealmInstance().where(MarketMap.class).notEqualTo("name", "").findAllSorted("name");
     }
 
     @Override

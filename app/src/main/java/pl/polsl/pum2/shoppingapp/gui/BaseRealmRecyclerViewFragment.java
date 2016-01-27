@@ -105,17 +105,18 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
             }
 
             @Override
-            public boolean onListItemLongClick(int position) {
+            public boolean onItemLongClick(int position) {
                 onRecyclerViewItemLongClick(position);
                 return false;
             }
 
             @Override
-            public void onDelete(int position) {
+            public void onItemDelete(int position) {
                 onRecyclerViewItemDelete(position);
             }
 
-            public void onItemEdit() {
+            @Override
+            public void onItemEditStart() {
                 listener.onEnterEditMode();
             }
 
@@ -123,6 +124,11 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
             public void onItemEditFailed(int position) {
                 MessageDialogFragment dialogFragment = MessageDialogFragment.newInstance(getString(R.string.nameAlreadyExists));
                 dialogFragment.show(getFragmentManager(), "nameExistsMessageDialog");
+            }
+
+            @Override
+            public void onItemEditDone() {
+                listener.onExitEditMode();
             }
 
             @Override

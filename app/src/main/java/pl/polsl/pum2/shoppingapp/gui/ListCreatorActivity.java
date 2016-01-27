@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -25,6 +26,8 @@ public class ListCreatorActivity extends AppCompatActivity {
     private Realm realm;
     private MarketMap selectedMap;
     private Spinner marketMapSpinner;
+    private CheckBox noMapCheckBox;
+    private Button editMarketMapButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,27 @@ public class ListCreatorActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         listName = (EditText) findViewById(R.id.shopping_list_name);
+        setupButtons();
+        setupSpinner();
+        noMapCheckBox = (CheckBox) findViewById(R.id.no_map_check_box);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        realm.close();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ListEditorActivity.EDIT_NEW_LIST) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
+        }
+    }
+
+    private void setupButtons() {
         Button newMarketMapButton = (Button) findViewById(R.id.newMarketMapButton);
         newMarketMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,7 +66,7 @@ public class ListCreatorActivity extends AppCompatActivity {
                 createOrEditMarketMap(false);
             }
         });
-        final Button editMarketMapButton = (Button) findViewById(R.id.editMarketMapButton);
+        editMarketMapButton = (Button) findViewById(R.id.editMarketMapButton);
         editMarketMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,8 +107,11 @@ public class ListCreatorActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void setupSpinner() {
         marketMapSpinner = (Spinner) findViewById(R.id.maret_map_spinner);
-        RealmResults<MarketMap> marketMaps = realm.where(MarketMap.class).findAll();
+        RealmResults<MarketMap> marketMaps = realm.where(MarketMap.class).notEqualTo("name", "").findAll();
         RealmSpinnerAdapter<MarketMap> spinnerAdapter = new RealmSpinnerAdapter<>(this, marketMaps, true);
         marketMapSpinner.setAdapter(spinnerAdapter);
         marketMapSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -96,7 +123,7 @@ public class ListCreatorActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                editMarketMapButton.setEnabled(false);
             }
         });
         if (marketMapSpinner.getSelectedItem() == null) {
@@ -104,19 +131,14 @@ public class ListCreatorActivity extends AppCompatActivity {
         }
     }
 
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        realm.close();
-    }
-
     private void saveList() throws RealmPrimaryKeyConstraintException {
         realm.beginTransaction();
         try {
             ShoppingList list = realm.createObject(ShoppingList.class);
             list.setName(listName.getText().toString().trim());
-            list.setMarketMap(selectedMap);
+            if (!noMapCheckBox.isChecked()) {
+                list.setMarketMap(selectedMap);
+            }
             realm.commitTransaction();
         } catch (RealmPrimaryKeyConstraintException primaryKeyException) {
             realm.cancelTransaction();
@@ -144,16 +166,6 @@ public class ListCreatorActivity extends AppCompatActivity {
 
     boolean formIsCompleted() {
         return listName.length() != 0 && marketMapSpinner.getSelectedItem() != null;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == ListEditorActivity.EDIT_NEW_LIST) {
-            if (resultCode == RESULT_OK) {
-                finish();
-            }
-        }
     }
 
 }

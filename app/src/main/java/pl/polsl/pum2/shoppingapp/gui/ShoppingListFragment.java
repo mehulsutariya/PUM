@@ -69,7 +69,6 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
         super.onCreate(savedInstanceState);
         listName = getArguments().getString(LIST_NAME);
         listType = getArguments().getInt(LIST_TYPE);
-
     }
 
     @Override
@@ -110,9 +109,7 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
             }
         }
 
-
         updatePriceSum();
-
         setRecyclerViewAdapter();
     }
 

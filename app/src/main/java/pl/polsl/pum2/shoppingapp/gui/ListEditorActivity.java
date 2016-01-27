@@ -19,6 +19,7 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import pl.polsl.pum2.shoppingapp.R;
+import pl.polsl.pum2.shoppingapp.database.MarketMap;
 import pl.polsl.pum2.shoppingapp.database.Product;
 import pl.polsl.pum2.shoppingapp.database.ProductCategory;
 import pl.polsl.pum2.shoppingapp.database.ShoppingList;
@@ -57,7 +58,13 @@ public class ListEditorActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
         shoppingList = realm.where(ShoppingList.class).equalTo("name", listName).findFirst();
         RealmResults<Product> products = realm.where(Product.class).findAll();
-        RealmResults<ProductCategory> productCategories = shoppingList.getMarketMap().getProductCategories().where().findAll();
+        MarketMap marketMap = shoppingList.getMarketMap();
+        RealmResults<ProductCategory> productCategories;
+        if (marketMap != null) {
+            productCategories = marketMap.getProductCategories().where().findAll();
+        } else {
+            productCategories = null;
+        }
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         ListEditorDataFragment dataFragment = (ListEditorDataFragment) fragmentManager.findFragmentByTag("dataFragment");
@@ -75,7 +82,12 @@ public class ListEditorActivity extends AppCompatActivity {
         recyclerViewLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
 
-        listAdapter = new ListEditorAdapter(this, listItems, products, productCategories, shoppingList.getMarketMap().getName());
+        String mapName = null;
+        if (marketMap != null) {
+            mapName = marketMap.getName();
+        }
+
+        listAdapter = new ListEditorAdapter(this, listItems, products, productCategories, mapName);
         recyclerView.setAdapter(listAdapter);
         if (listItems.size() == 0) {
             insertNewItem();

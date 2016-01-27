@@ -51,26 +51,29 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        Product product = dataSource.get(position).getProduct();
+        ShoppingListItem item = dataSource.get(position);
+        Product product = item.getProduct();
         if (product != null) {
             holder.productName.setText(product.getName());
         } else {
             holder.productName.setText("");
         }
-        //TODO holder.productCategory
         NumberFormat numberFormat = NumberFormat.getNumberInstance();
         if (numberFormat instanceof DecimalFormat) {
             ((DecimalFormat) numberFormat).setDecimalSeparatorAlwaysShown(false);
         }
-        if (dataSource.get(position).getPrice() == 0.0) {
+        if (item.getPrice() == 0.0) {
             holder.price.setText("");
         } else {
-            holder.price.setText(numberFormat.format(dataSource.get(position).getPrice()));
+            holder.price.setText(numberFormat.format(item.getPrice()));
         }
-        if (dataSource.get(position).getQuantity() == 0) {
+        if (item.getQuantity() == 0) {
             holder.quantity.setText("");
         } else {
-            holder.quantity.setText(numberFormat.format(dataSource.get(position).getQuantity()));
+            holder.quantity.setText(numberFormat.format(item.getQuantity()));
+        }
+        if (productCategories != null) {
+            holder.productCategory.setSelection(item.getCategoryIndex());
         }
 
     }
@@ -108,7 +111,7 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
             price.addTextChangedListener(new TextListener(TextListener.PRICE, this));
             quantity.addTextChangedListener(new TextListener(TextListener.QUANTITY, this));
 
-            productName.setAdapter(new AutocompleteAdapter(context, products));
+            productName.setAdapter(new AutocompleteAdapter<>(context, products));
             productName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                 @Override
@@ -120,28 +123,34 @@ public class ListEditorAdapter extends RecyclerView.Adapter<ListEditorAdapter.Vi
                     productName.append(item.getName());
                 }
             });
+            if (productCategories != null) {
+                RealmSpinnerAdapter<ProductCategory> spinnerAdapter = new RealmSpinnerAdapter<>(context, productCategories, true);
+                productCategory.setAdapter(spinnerAdapter);
+                productCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        ShoppingListItem item = dataSource.get(getAdapterPosition());
+                        item.setCategory((ProductCategory) parent.getAdapter().getItem(position));
+                        item.setCategoryIndex(position);
+                    }
 
-            RealmSpinnerAdapter<ProductCategory> spinnerAdapter = new RealmSpinnerAdapter<>(context, productCategories, true);
-            productCategory.setAdapter(spinnerAdapter);
-            productCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    dataSource.get(getAdapterPosition()).setCategory((ProductCategory) parent.getAdapter().getItem(position));
-                }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-            addCategoryButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, MarketMapEditorActivity.class);
-                    intent.putExtra(MarketMapEditorActivity.MAP_NAME, marketMapName);
-                    context.startActivity(intent);
-                }
-            });
+                    }
+                });
+                addCategoryButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, MarketMapEditorActivity.class);
+                        intent.putExtra(MarketMapEditorActivity.MAP_NAME, marketMapName);
+                        context.startActivity(intent);
+                    }
+                });
+            } else {
+                productCategory.setVisibility(View.GONE);
+                addCategoryButton.setVisibility(View.GONE);
+            }
         }
     }
 

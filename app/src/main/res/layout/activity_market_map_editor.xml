@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".gui.MarketMapEditorActivity">
 
     <LinearLayout
@@ -22,19 +22,18 @@
                 android:id="@+id/map_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/map_name"
                 android:imeOptions="actionDone"
-                android:singleLine="true"
-                android:hint="@string/map_name" />
+                android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
 
-        <co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/map_content_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:scrollbars="vertical"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            app:rrvLayoutType="LinearLayout" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </LinearLayout>
 

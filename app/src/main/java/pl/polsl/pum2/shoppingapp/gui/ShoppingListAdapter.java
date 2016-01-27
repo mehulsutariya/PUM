@@ -65,9 +65,10 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
 
     @Override
     public void onBindRealmViewHolder(ViewHolder holder, int position) {
-        holder.productName.setText(realmResults.get(position).getProduct().getName());
-        holder.productNameEdit.setText(realmResults.get(position).getProduct().getName());
-        Double price = realmResults.get(position).getPrice();
+        ShoppingListItem item = realmResults.get(position);
+        holder.productName.setText(item.getProduct().getName());
+        holder.productNameEdit.setText(item.getProduct().getName());
+        Double price = item.getPrice();
         String priceText;
         NumberFormat numberFormat;
         if (price > 0) {
@@ -84,7 +85,7 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
             priceText = "";
         }
         holder.priceEdit.setText(priceText);
-        Double quantity = realmResults.get(position).getQuantity();
+        Double quantity = item.getQuantity();
         numberFormat = NumberFormat.getNumberInstance();
         if (numberFormat instanceof DecimalFormat) {
             ((DecimalFormat) numberFormat).setDecimalSeparatorAlwaysShown(false);
@@ -92,8 +93,8 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
         holder.quantity.setText(String.format(context.getString(R.string.quantity_string), numberFormat.format(quantity)));
         holder.quantityEdit.setText(quantity.toString());
         if (productCategories != null) {
-            if (realmResults.get(position).getCategory() != null) {
-                holder.productCategory.setSelection(realmResults.get(position).getCategoryIndex());
+            if (item.getCategory() != null && item.getCategoryIndex() != -1) {
+                holder.productCategory.setSelection(item.getCategoryIndex());
             } else {
                 holder.productCategory.setVisibility(View.GONE);
                 holder.setCategoryButton.setVisibility(View.VISIBLE);
@@ -242,7 +243,7 @@ class ShoppingListAdapter extends RealmBasedRecyclerViewAdapter<ShoppingListItem
         private void showPopupMenu(View v) {
             PopupMenu popup = new PopupMenu(context, v);
             MenuInflater inflater = popup.getMenuInflater();
-            inflater.inflate(R.menu.menu_shopping_list_item, popup.getMenu());
+            inflater.inflate(R.menu.menu_recycler_view_item, popup.getMenu());
             popup.setOnMenuItemClickListener(this);
             popup.show();
         }

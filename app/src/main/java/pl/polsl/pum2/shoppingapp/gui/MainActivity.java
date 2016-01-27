@@ -171,6 +171,7 @@ public class MainActivity extends AppCompatActivity
         fab.hide();
     }
 
+    @Override
     public void onExitEditMode() {
         fabLayoutParams.setBehavior(scrollFABBehavior);
         if (navigationViewCheckedItem == R.id.nav_shopping_lists) {
