@@ -160,11 +160,19 @@ public class ListCreatorActivity extends AppCompatActivity {
     }
 
     private void showIncompleteFormMessageDialog() {
-        MessageDialogFragment messageDialogFragment = MessageDialogFragment.newInstance(getString(R.string.new_list_form_message));
+        String message;
+        if (noMapCheckBox.isChecked()) {
+            message = (getString(R.string.new_list_form_message_without_map));
+        } else {
+            message = (getString(R.string.new_list_form_message));
+        }
+        MessageDialogFragment messageDialogFragment = MessageDialogFragment.newInstance(message);
         messageDialogFragment.show(getSupportFragmentManager(), MESSAGE_DIALOG_TAG);
     }
 
     boolean formIsCompleted() {
+        if (noMapCheckBox.isChecked())
+            return listName.length() != 0;
         return listName.length() != 0 && marketMapSpinner.getSelectedItem() != null;
     }
 
