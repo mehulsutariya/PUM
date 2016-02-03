@@ -233,6 +233,7 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 actionMode = null;
+                numberOfCheckedItems = 0;
                 RealmResults<T> checkedItems = listItems.where().equalTo("checked", true).findAll();
                 if (checkedItems.size() > 0) {
                     realm.beginTransaction();
