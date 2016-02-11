@@ -107,6 +107,7 @@ public class ShoppingListFragment extends Fragment implements DeleteItemDialogFr
             } else {
                 listItems = shoppingList.getItems().where().equalTo("isBought", true).isNotNull("product").findAll();
             }
+            productCategories = null;
         }
 
         updatePriceSum();

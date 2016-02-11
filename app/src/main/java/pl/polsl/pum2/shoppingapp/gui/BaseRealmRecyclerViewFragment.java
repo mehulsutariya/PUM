@@ -21,7 +21,6 @@ import pl.polsl.pum2.shoppingapp.database.CheckableRealmObjectWithName;
 
 public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & CheckableRealmObjectWithName> extends Fragment {
 
-    private final String NUMBER_OF_CHECKED_ITEMS = "numberOfCheckedItems";
     private Realm realm;
     private RealmResults<T> listItems;
     private RealmRecyclerView productsRecyclerView;
@@ -50,14 +49,6 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionMode();
-        if (savedInstanceState != null) {
-            numberOfCheckedItems = savedInstanceState.getInt(NUMBER_OF_CHECKED_ITEMS);
-        } else {
-            numberOfCheckedItems = 0;
-        }
-        if (numberOfCheckedItems > 0) {
-            actionMode = getActivity().startActionMode(actionModeCallback);
-        }
     }
 
     @Override
@@ -87,12 +78,6 @@ public abstract class BaseRealmRecyclerViewFragment<T extends RealmObject & Chec
     public void onDetach() {
         super.onDetach();
         listener = null;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outBundle) {
-        super.onSaveInstanceState(outBundle);
-        outBundle.putInt(NUMBER_OF_CHECKED_ITEMS, numberOfCheckedItems);
     }
 
     private void setRecyclerViewAdapter() {
